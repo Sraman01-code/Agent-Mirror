@@ -1,0 +1,145 @@
+{
+  "generatedAt": "2026-05-16T00:00:00.000Z",
+  "honestyNote": "Likely representation based on machine-readable evidence and shopping-agent evaluation rules. Not a measurement of real AI-engine behavior.",
+  "store": {
+    "id": "trailhead-supply-co",
+    "name": "Trailhead Supply Co.",
+    "source": "mock"
+  },
+  "syncStatus": {
+    "productsSynced": 24,
+    "collectionsScanned": 8,
+    "publicPagesCrawled": 12,
+    "policyFaqGaps": 6,
+    "lastSyncedLabel": "Demo snapshot · seeded"
+  },
+  "brief": {
+    "positioning": "Best waterproof trail shoe under $150 for hikers who want durable grip, clear sizing, fast shipping, and easy returns.",
+    "heroProductIds": ["aquatrail-pro"],
+    "targetBuyer": "Day-and-multi-day hikers who shop on price, durability, and return confidence",
+    "mustSayFacts": [
+      "Waterproof to a stated rating",
+      "Outsole material and grip performance",
+      "Clear size/fit guidance",
+      "Shipping speed and cost",
+      "Easy, time-bound return window"
+    ],
+    "priceCeiling": { "amountMinor": 15000, "currency": "USD" }
+  },
+  "desiredRepresentation": "Best waterproof trail shoe under $150 for hikers who want durable grip, clear sizing, fast shipping, and easy returns.",
+  "currentPerception": "AI can identify AquaTrail Pro as a waterproof trail shoe, but it cannot confidently explain the return window, shipping speed, outsole material, variant differences, or trust proof.",
+  "score": {
+    "arq": 58,
+    "band": "at_risk",
+    "computedAt": "2026-05-16T00:00:00.000Z",
+    "pillars": [
+      { "pillar": "catalog_completeness", "label": "Catalog completeness", "maxPoints": 25, "score": 15, "deductions": [{ "reasonCode": "SPEC_MISSING", "fieldPath": "products[aquatrail-pro].attributes", "delta": -10, "message": "Outsole material and technical specs absent" }] },
+      { "pillar": "offer_reliability", "label": "Offer reliability", "maxPoints": 20, "score": 11, "deductions": [{ "reasonCode": "SHIPPING_UNSTATED", "fieldPath": "store.shippingPolicy", "delta": -9, "message": "Shipping speed and cost not machine-legible" }] },
+      { "pillar": "policy_clarity", "label": "Policy clarity", "maxPoints": 15, "score": 7, "deductions": [{ "reasonCode": "RETURN_VAGUE", "fieldPath": "store.returnPolicy", "delta": -8, "message": "Return window is vague and not time-bound" }] },
+      { "pillar": "trust_and_proof", "label": "Trust & proof", "maxPoints": 15, "score": 8, "deductions": [{ "reasonCode": "REVIEW_THIN", "fieldPath": "products[aquatrail-pro].reviews", "delta": -7, "message": "Weak review/ratings proof" }] },
+      { "pillar": "answerability", "label": "Answerability", "maxPoints": 15, "score": 9, "deductions": [{ "reasonCode": "FAQ_GAP", "fieldPath": "store.faq", "delta": -6, "message": "Common buyer questions unanswered" }] },
+      { "pillar": "intent_alignment", "label": "Intent alignment", "maxPoints": 10, "score": 8, "deductions": [{ "reasonCode": "BRIEF_PARTIAL", "fieldPath": "brief.mustSayFacts", "delta": -2, "message": "Some must-say facts unsupported by data" }] }
+    ],
+    "perProduct": [
+      { "productId": "aquatrail-pro", "name": "AquaTrail Pro", "arq": 56 }
+    ]
+  },
+  "representation": [
+    {
+      "scope": "product",
+      "entityId": "aquatrail-pro",
+      "summary": "AI can identify AquaTrail Pro as a waterproof trail shoe, but it cannot confidently explain the return window, shipping speed, outsole material, variant differences, or trust proof.",
+      "questions": [
+        {
+          "questionId": "use_case",
+          "answer": "Likely answer today: “a lightweight waterproof trail shoe, available in several sizes” — hedged, no durability or grip specifics.",
+          "confidence": 0.42,
+          "citedFields": ["products[aquatrail-pro].title", "products[aquatrail-pro].tags"],
+          "missingToAnswer": ["outsole material", "waterproof rating", "fit guidance"],
+          "misrepresentationRisk": "high",
+          "ambiguityFlags": ["“durable material” is non-specific"]
+        }
+      ]
+    }
+  ],
+  "findings": [
+    { "id": "f1", "kind": "ambiguous_value", "reasonCode": "RETURN_VAGUE", "severity": "high", "scope": "store", "entityId": "trailhead-supply-co", "fieldPath": "store.returnPolicy", "message": "Vague return policy — no explicit, time-bound return window", "pillar": "policy_clarity", "evidence": "“returns accepted within a reasonable period”" },
+    { "id": "f2", "kind": "missing_field", "reasonCode": "SHIPPING_UNSTATED", "severity": "high", "scope": "store", "entityId": "trailhead-supply-co", "fieldPath": "store.shippingPolicy", "message": "Missing shipping speed and cost details", "pillar": "offer_reliability", "evidence": null },
+    { "id": "f3", "kind": "missing_attribute", "reasonCode": "SPEC_MISSING", "severity": "critical", "scope": "product", "entityId": "aquatrail-pro", "fieldPath": "products[aquatrail-pro].attributes", "message": "Missing material / outsole / spec details", "pillar": "catalog_completeness", "evidence": null },
+    { "id": "f4", "kind": "missing_attribute", "reasonCode": "VARIANT_INCOMPLETE", "severity": "high", "scope": "product", "entityId": "aquatrail-pro", "fieldPath": "products[aquatrail-pro].variants", "message": "Incomplete size/color variant grouping", "pillar": "catalog_completeness", "evidence": "color set on title only, no option axis" },
+    { "id": "f5", "kind": "trust_gap", "reasonCode": "REVIEW_THIN", "severity": "medium", "scope": "product", "entityId": "aquatrail-pro", "fieldPath": "products[aquatrail-pro].reviews", "message": "Weak trust / review proof", "pillar": "trust_and_proof", "evidence": "no aggregate rating exposed" },
+    { "id": "f6", "kind": "unanswered_question", "reasonCode": "FAQ_GAP", "severity": "medium", "scope": "store", "entityId": "trailhead-supply-co", "fieldPath": "store.faq", "message": "Missing FAQ answers for common buyer questions", "pillar": "answerability", "evidence": null },
+    { "id": "f7", "kind": "thin_content", "reasonCode": "ALT_WEAK", "severity": "low", "scope": "product", "entityId": "aquatrail-pro", "fieldPath": "products[aquatrail-pro].media[].alt", "message": "Weak image alt text", "pillar": "catalog_completeness", "evidence": "“shoe1.jpg”" },
+    { "id": "f8", "kind": "weak_differentiation", "reasonCode": "SCHEMA_WEAK", "severity": "low", "scope": "store", "entityId": "trailhead-supply-co", "fieldPath": "publicSnapshot.structuredData", "message": "Weak structured-data readiness", "pillar": "offer_reliability", "evidence": "no Product/Offer JSON-LD detected" }
+  ],
+  "plan": [
+    { "id": "r1", "templateId": "clarify-return", "title": "Clarify return policy", "rationale": "State an explicit, time-bound return window and link it from the PDP so agents can answer “easy returns” confidently.", "affectedEntities": [{ "scope": "store", "id": "trailhead-supply-co" }], "resolvesFindingIds": ["f1"], "predictedArqGain": 5, "conversionImportance": 0.9, "confidence": 0.9, "effort": 1, "priorityScore": 4.05, "label": "blocks_trust" },
+    { "id": "r2", "templateId": "add-shipping", "title": "Add shipping speed and cost details", "rationale": "Expose delivery speed and cost; shipping is a first-class buyer-decision factor for AI shopping answers.", "affectedEntities": [{ "scope": "store", "id": "trailhead-supply-co" }], "resolvesFindingIds": ["f2"], "predictedArqGain": 3, "conversionImportance": 0.85, "confidence": 0.85, "effort": 1, "priorityScore": 2.17, "label": "blocks_recommendation" },
+    { "id": "r3", "templateId": "add-specs", "title": "Add material/outsole/spec details", "rationale": "Add outsole material, waterproof rating, and technical specs so the agent stops hedging on durability and grip.", "affectedEntities": [{ "scope": "product", "id": "aquatrail-pro" }], "resolvesFindingIds": ["f3"], "predictedArqGain": 4, "conversionImportance": 0.8, "confidence": 0.8, "effort": 2, "priorityScore": 1.28, "label": "blocks_recommendation" },
+    { "id": "r4", "templateId": "fix-variants", "title": "Fix variant grouping for size and color", "rationale": "Promote size/color to proper option axes so agents can answer fit and availability questions.", "affectedEntities": [{ "scope": "product", "id": "aquatrail-pro" }], "resolvesFindingIds": ["f4"], "predictedArqGain": 2, "conversionImportance": 0.6, "confidence": 0.75, "effort": 2, "priorityScore": 0.45, "label": "quick_win" },
+    { "id": "r5", "templateId": "add-faq", "title": "Add FAQ answers for common buyer questions", "rationale": "Cover the unanswered buyer questions so answerability and intent alignment rise together.", "affectedEntities": [{ "scope": "store", "id": "trailhead-supply-co" }], "resolvesFindingIds": ["f6"], "predictedArqGain": 3, "conversionImportance": 0.65, "confidence": 0.7, "effort": 2, "priorityScore": 0.68, "label": "can_apply_now" },
+    { "id": "r6", "templateId": "improve-media-schema", "title": "Improve image alt text and structured data", "rationale": "Descriptive alt text and Product/Offer structured data make the public page machine-legible to crawlers.", "affectedEntities": [{ "scope": "product", "id": "aquatrail-pro" }, { "scope": "store", "id": "trailhead-supply-co" }], "resolvesFindingIds": ["f7", "f8"], "predictedArqGain": 1, "conversionImportance": 0.4, "confidence": 0.7, "effort": 1, "priorityScore": 0.28, "label": "quick_win" }
+  ],
+  "questionCoverage": [
+    { "questionId": "use_case", "questionText": "Is this good for multi-day rainy hikes?", "status": "partially_answered", "bestAnswer": "Identified as a waterproof trail shoe, but durability and grip are unstated.", "matchedSources": ["products[aquatrail-pro].title"], "missingInformation": ["waterproof rating", "outsole material"] },
+    { "questionId": "fit", "questionText": "What size should I order?", "status": "partially_answered", "bestAnswer": "Sizes exist but variant grouping is incomplete and no fit guidance.", "matchedSources": ["products[aquatrail-pro].variants"], "missingInformation": ["size chart", "fit notes"] },
+    { "questionId": "materials", "questionText": "What is the outsole made of?", "status": "unanswered", "bestAnswer": "No material or spec data available.", "matchedSources": [], "missingInformation": ["outsole material", "upper material"] },
+    { "questionId": "shipping", "questionText": "How fast and how much is shipping?", "status": "unanswered", "bestAnswer": "Shipping speed and cost not stated.", "matchedSources": [], "missingInformation": ["shipping speed", "shipping cost"] },
+    { "questionId": "returns", "questionText": "What is the return window?", "status": "partially_answered", "bestAnswer": "Returns mentioned but not time-bound.", "matchedSources": ["store.returnPolicy"], "missingInformation": ["explicit return window"] },
+    { "questionId": "trust", "questionText": "Is this well reviewed?", "status": "unanswered", "bestAnswer": "No aggregate rating or review proof exposed.", "matchedSources": [], "missingInformation": ["review count", "average rating"] }
+  ],
+  "simulation": {
+    "delta": 18,
+    "appliedRecommendationIds": ["r1", "r2", "r3", "r4", "r5", "r6"],
+    "before": {
+      "arq": 58,
+      "band": "at_risk",
+      "pillars": [
+        { "pillar": "catalog_completeness", "label": "Catalog completeness", "maxPoints": 25, "score": 15 },
+        { "pillar": "offer_reliability", "label": "Offer reliability", "maxPoints": 20, "score": 11 },
+        { "pillar": "policy_clarity", "label": "Policy clarity", "maxPoints": 15, "score": 7 },
+        { "pillar": "trust_and_proof", "label": "Trust & proof", "maxPoints": 15, "score": 8 },
+        { "pillar": "answerability", "label": "Answerability", "maxPoints": 15, "score": 9 },
+        { "pillar": "intent_alignment", "label": "Intent alignment", "maxPoints": 10, "score": 8 }
+      ]
+    },
+    "after": {
+      "arq": 76,
+      "band": "at_risk",
+      "pillars": [
+        { "pillar": "catalog_completeness", "label": "Catalog completeness", "maxPoints": 25, "score": 20 },
+        { "pillar": "offer_reliability", "label": "Offer reliability", "maxPoints": 20, "score": 15 },
+        { "pillar": "policy_clarity", "label": "Policy clarity", "maxPoints": 15, "score": 11 },
+        { "pillar": "trust_and_proof", "label": "Trust & proof", "maxPoints": 15, "score": 10 },
+        { "pillar": "answerability", "label": "Answerability", "maxPoints": 15, "score": 10 },
+        { "pillar": "intent_alignment", "label": "Intent alignment", "maxPoints": 10, "score": 10 }
+      ]
+    },
+    "changedFindingIds": { "resolved": ["f1", "f2", "f3", "f4", "f6", "f7", "f8"], "introduced": [] },
+    "drivers": [
+      "Clarifying the return policy lifted Policy clarity (+4) and Trust & proof.",
+      "Shipping speed/cost and structured data lifted Offer reliability (+4).",
+      "Material/outsole specs and variant grouping lifted Catalog completeness (+5).",
+      "FAQ answers lifted Answerability (+1) and Intent alignment to full (+2)."
+    ],
+    "sampleAnswers": [
+      {
+        "questionId": "use_case",
+        "before": "A lightweight waterproof trail shoe, available in several sizes. (hedged — misrepresentation risk: HIGH)",
+        "after": "A waterproof (rated) trail shoe under $150 with a durable rubber outsole for grip, clear size/fit guidance, fast shipping, and a 30-day easy return window. (confident — misrepresentation risk: LOW)"
+      }
+    ]
+  },
+  "acpPreview": {
+    "coveragePct": 92,
+    "submissionNote": "Validated against the published ACP feed schema. Preview only — no live OpenAI submission.",
+    "warnings": [
+      "2 products missing GTIN/MPN",
+      "Return window not yet machine-readable on 1 policy"
+    ],
+    "missingFields": [
+      { "productId": "aquatrail-pro", "fields": ["gtin", "material"] },
+      { "productId": "ridgeline-2l-jacket", "fields": ["gtin"] }
+    ]
+  }
+}
