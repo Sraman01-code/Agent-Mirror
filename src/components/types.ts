@@ -1,9 +1,19 @@
-// M1.2 placeholder types for the static seed payload.
-// Replaced by the canonical domain model in M2.1 (see docs/DATA_MODEL.md).
-// Kept intentionally permissive so M1.2 stays presentation-only.
+// M2.1: the canonical domain model now lives in src/domain/model/index.ts
+// (docs/DATA_MODEL.md). This module re-exports it so the whole app can reach
+// the schema contract through one barrel. `Severity` below now resolves to the
+// canonical union via this star re-export (identical members).
+//
+// The remaining declarations are the M1.2 *presentational view-model* for the
+// hand-authored seed/demoResult.json (consumed read-only and cast via
+// `as unknown`). They are intentionally permissive and demo-shaped; where a
+// name overlaps the canonical model (`Finding`, `Recommendation`), the local
+// presentational declaration takes precedence for this barrel's consumers,
+// keeping the static dashboard byte-identical. Engine/scoring milestones
+// import the strict types from "@/domain/model" directly.
+export * from "@/domain/model";
+import type { Severity } from "@/domain/model";
 
 export type Band = "healthy" | "at_risk" | "invisible";
-export type Severity = "critical" | "high" | "medium" | "low";
 
 export interface Pillar {
   pillar: string;

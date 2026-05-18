@@ -10,13 +10,15 @@ Status key: `[ ]` not done · `[x]` verified · `[~]` partial/blocked (add note)
 ---
 
 ## Global gates (re-run every milestone from M1.1)
-- [x] `npm run typecheck` passes  *(M1.1✓ · M1.2✓ clean)*
-- [x] `npm run lint` passes  *(M1.1✓ · M1.2✓ no warnings/errors; `next lint`
-  deprecation notice is informational only, migrate before Next 16)*
-- [x] `npm run build` passes  *(M1.1✓ · M1.2✓ — 6 routes, /dashboard static)*
+- [x] `npm run typecheck` passes  *(M1.1✓ · M1.2✓ · M2.1✓ clean)*
+- [x] `npm run lint` passes  *(M1.1✓ · M1.2✓ · M2.1✓ no warnings/errors;
+  `next lint` deprecation notice is informational only, migrate before Next 16)*
+- [x] `npm run build` passes  *(M1.1✓ · M1.2✓ · M2.1✓ — 6 routes, /dashboard
+  static; bundle sizes unchanged vs M1.2)*
 - [ ] `npm test` passes (from M3.1 on)
-- [x] No previously-checked item regressed  *(M1.2: docs + scaffold + health
-  untouched; stale M1.1 dev server killed)*
+- [x] No previously-checked item regressed  *(M2.1: domain model is types-only;
+  `components/types.ts` re-exports it, presentational view-model + seed JSON +
+  all 6 panels unchanged; /dashboard bundle byte-identical)*
 - [x] Relevant `docs/*.md` updated in the same commit (docs-are-contracts)
 
 ---
@@ -54,7 +56,9 @@ Status key: `[ ]` not done · `[x]` verified · `[~]` partial/blocked (add note)
 
 ## Phase 2 — Typed Mock Data
 ### M2.1 Domain types
-- [ ] All DATA_MODEL types compile, barrel-exported
+- [x] All DATA_MODEL types compile, barrel-exported  *(src/domain/model/
+  index.ts: all 27 canonical types + PILLAR_MAX (sums to 100); types-only,
+  zero logic; re-exported via `@/components/types`; typecheck/lint/build green)*
 ### M2.2 Mock store + port
 - [ ] `GET /api/store` returns valid `Store`
 - [ ] Seed has ≥1 of every defect kind; deterministic (no Date/random)
