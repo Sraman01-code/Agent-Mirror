@@ -10,21 +10,24 @@ Status key: `[ ]` not done · `[x]` verified · `[~]` partial/blocked (add note)
 ---
 
 ## Global gates (re-run every milestone from M1.1)
-- [x] `npm run typecheck` passes  *(… · M4.1✓ · M4.2✓ · M5.1✓ clean)*
-- [x] `npm run lint` passes  *(… · M4.1✓ · M4.2✓ · M5.1✓ no warnings/errors;
+- [x] `npm run typecheck` passes  *(… · M4.2✓ · M5.1✓ · M5.2✓ clean)*
+- [x] `npm run lint` passes  *(… · M4.2✓ · M5.1✓ · M5.2✓ no warnings/errors;
   `next lint` deprecation notice is informational only, migrate before Next 16)*
-- [x] `npm run build` passes  *(… · M4.2✓ · M5.1✓ — 10 routes (+/api/score);
+- [x] `npm run build` passes  *(… · M5.1✓ · M5.2✓ — 11 routes (+/api/recommend);
   /dashboard still ○ static, 165 B / 106 kB byte-identical vs M1.2)*
 - [x] `npm test` passes (from M3.1 on)  *(M3.1✓ 6 audit · M4.1✓ +7 represent ·
-  M4.2✓ +8 factory · M5.1✓ +9 scoring = 30/30 green, zero network)*
-- [x] No previously-checked item regressed  *(M5.1: scoring is additive &
-  pure (no LLM/Date/random in hashable result); audit/represent/store
-  untouched so prior 21 tests stay green (30/30 total); seed/demoStore.ts +
-  seed/demoResult.json + 6 panels + dashboard untouched; /dashboard still ○
-  static 165 B byte-identical; locked demo numbers 58 / At Risk / 76 / +18 /
-  92% unchanged. DOC CHANGE (docs-are-contracts): at_risk band lower bound
-  60→58 in PROJECT_MEMORY §7 + DATA_MODEL §3 with rationale — required to keep
-  the locked demo (ARQ 58 ⇒ at_risk) consistent; 80 cutoff unchanged)*
+  M4.2✓ +8 factory · M5.1✓ +9 scoring · M5.2✓ +12 recommend = 42/42 green,
+  zero network)*
+- [x] No previously-checked item regressed  *(M5.2: recommend is additive &
+  pure (no LLM/represent/Date/random/fetch in hashable result — zero-network
+  test); audit/scoring/represent/store engines + their tests untouched so all
+  prior 30 tests stay green (42/42 total); seed/demoStore.ts +
+  seed/demoResult.json + scoring constants + 6 panels + dashboard untouched;
+  /dashboard still ○ static 165 B byte-identical; live /api/score still ARQ 58
+  at_risk, /api/represent/audit/store unbroken; locked demo numbers 58 / At
+  Risk / 76 / +18 / 92% unchanged; no scope creep (no simulator UI / dashboard
+  wiring / Shopify / DB / real-LLM ranking). No doc-contract changes needed
+  beyond the M5.2 checklist (M5.1's 60→58 band rationale stands as-is))*
 - [x] Relevant `docs/*.md` updated in the same commit (docs-are-contracts)
 
 ---
@@ -139,8 +142,22 @@ Status key: `[ ]` not done · `[x]` verified · `[~]` partial/blocked (add note)
 - [~] after-fix ARQ == 76: NOT in M5.1 scope — that delta is produced by the
   M6.1 simulation engine (apply fixes → re-audit → re-score). Deferred.
 ### M5.2 Recommendations
-- [ ] `predictedArqGain` == scorer delta on patched copy
-- [ ] Ranked by `priorityScore`; deterministic
+- [x] `predictedArqGain` == scorer delta on patched copy  *(engine deep-clones
+  the store via structuredClone, applies the declarative FixPatch (DATA_MODEL
+  §6 set/add/fillAttribute), re-runs audit+score on the clone; per-rec test
+  asserts predictedArqGain === independent re-score delta for all 11 recs;
+  source store + findings byte-identical before/after (no-mutation test);
+  applying ALL patches strictly increases ARQ 58→100 — see report note re: the
+  documented +18→76 which is the curated M6.1 simulation subset, NOT M5.2's
+  contract; locked numbers untouched)*
+- [x] Ranked by `priorityScore`; deterministic  *(priorityScore =
+  predictedArqGain × conversionImportance × confidence ÷ effort; sorted desc
+  with stable tiebreaks gain→effort→templateId; output byte-identical across
+  runs (unit + two live POST /api/recommend calls); 11 templates keyed to the
+  exact reasonCodes audit(demoStore,demoBrief) emits; each rec has all
+  DATA_MODEL §5 fields, a valid FixPatch, non-empty merchant copy, a label;
+  return policy #1 (1.805) & shipping #2 (1.62) rank at the top; BAD_INPUT on
+  malformed body; 12/12 recommend tests green; transport-only route, no LLM)*
 
 ## Phase 6 — Simulator
 ### M6.1 Simulation
