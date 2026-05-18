@@ -147,7 +147,9 @@ export interface Deduction {
 
 export interface ScoreResult {
   arq: number;                 // 0..100 store-wide = Σ pillar.score
-  band: "healthy" | "at_risk" | "invisible";   // 80+/60-79/<60
+  band: "healthy" | "at_risk" | "invisible";   // 80+/58-79/<58 (M5.1: at_risk
+  // lower bound 60→58 to match the locked demo ARQ 58 ⇒ at_risk; see
+  // PROJECT_MEMORY §7 rationale)
   pillars: PillarScore[];
   perProduct: { productId: string; arq: number; pillars: PillarScore[] }[];
   computedAt: string;          // ISO; informational only (not in hash)

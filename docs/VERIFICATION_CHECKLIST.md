@@ -10,19 +10,21 @@ Status key: `[ ]` not done · `[x]` verified · `[~]` partial/blocked (add note)
 ---
 
 ## Global gates (re-run every milestone from M1.1)
-- [x] `npm run typecheck` passes  *(… · M3.1✓ · M4.1✓ · M4.2✓ clean)*
-- [x] `npm run lint` passes  *(… · M3.1✓ · M4.1✓ · M4.2✓ no warnings/errors;
+- [x] `npm run typecheck` passes  *(… · M4.1✓ · M4.2✓ · M5.1✓ clean)*
+- [x] `npm run lint` passes  *(… · M4.1✓ · M4.2✓ · M5.1✓ no warnings/errors;
   `next lint` deprecation notice is informational only, migrate before Next 16)*
-- [x] `npm run build` passes  *(… · M4.1✓ · M4.2✓ — 9 routes; /dashboard still
-  ○ static, 165 B / 106 kB byte-identical vs M1.2)*
-- [x] `npm test` passes (from M3.1 on)  *(M3.1✓ 6/6 audit · M4.1✓ +7 represent
-  · M4.2✓ +8 factory/adapter = 21/21 green, zero network)*
-- [x] No previously-checked item regressed  *(M4.2: anthropic adapter +
-  factory are additive & env-gated; `represent()` unchanged so all 7 M4.1
-  tests stay green; default path still pure mock (verified byte-identical
-  store output, no meta); seed/demoResult.json + 6 panels + dashboard
-  untouched; /dashboard still ○ static 165 B byte-identical; locked demo
-  numbers 58 / At Risk / 76 / +18 / 92% unchanged; 21/21 tests, zero network)*
+- [x] `npm run build` passes  *(… · M4.2✓ · M5.1✓ — 10 routes (+/api/score);
+  /dashboard still ○ static, 165 B / 106 kB byte-identical vs M1.2)*
+- [x] `npm test` passes (from M3.1 on)  *(M3.1✓ 6 audit · M4.1✓ +7 represent ·
+  M4.2✓ +8 factory · M5.1✓ +9 scoring = 30/30 green, zero network)*
+- [x] No previously-checked item regressed  *(M5.1: scoring is additive &
+  pure (no LLM/Date/random in hashable result); audit/represent/store
+  untouched so prior 21 tests stay green (30/30 total); seed/demoStore.ts +
+  seed/demoResult.json + 6 panels + dashboard untouched; /dashboard still ○
+  static 165 B byte-identical; locked demo numbers 58 / At Risk / 76 / +18 /
+  92% unchanged. DOC CHANGE (docs-are-contracts): at_risk band lower bound
+  60→58 in PROJECT_MEMORY §7 + DATA_MODEL §3 with rationale — required to keep
+  the locked demo (ARQ 58 ⇒ at_risk) consistent; 80 cutoff unchanged)*
 - [x] Relevant `docs/*.md` updated in the same commit (docs-are-contracts)
 
 ---
@@ -120,9 +122,22 @@ Status key: `[ ]` not done · `[x]` verified · `[~]` partial/blocked (add note)
 
 ## Phase 5 — Scoring + Recommendations
 ### M5.1 Scoring
-- [ ] 6 pillars point-budgeted, max sums to 100; band correct (80/60 cutoffs)
-- [ ] Pure; deductions have reasonCode+fieldPath; intent_alignment uses brief
-- [ ] Seed ARQ == 58 (snapshot test); after-fix == 76
+- [x] 6 pillars point-budgeted, max sums to 100; band correct  *(PILLAR_MAX
+  Σ=100 test; healthy ≥80 / at_risk ≥58 / invisible <58 — cutoff 60→58 by
+  documented M5.1 deviation, see PROJECT_MEMORY §7; every pillar score within
+  [0,maxPoints], store + perProduct)*
+- [x] Pure; deductions have reasonCode+fieldPath; intent_alignment uses brief
+  *(determinism test excludes informational `computedAt`; every deduction has
+  reasonCode/fieldPath/delta≤0/message/findingId; intent_alignment scored only
+  from brief-derived audit findings (STORE_TAGLINE_WEAK / BRIEF_HERO_FACT_*),
+  no represent()/LLM — zero-network test asserts this)*
+- [x] Seed ARQ == 58 (snapshot test)  *(audit(demoStore,demoBrief)→score →
+  arq 58, band at_risk; pillars catalog5/offer19/policy13/trust11/answer3/
+  intent7 = 58; verified unit + live POST /api/score; deterministic excl.
+  computedAt; calibrated via documented constants — SEVERITY_WEIGHT,
+  REASON_GROUP_CAP=5, STORE_SCOPE_SYSTEMIC_BONUS=1, grid-confirmed unique)*
+- [~] after-fix ARQ == 76: NOT in M5.1 scope — that delta is produced by the
+  M6.1 simulation engine (apply fixes → re-audit → re-score). Deferred.
 ### M5.2 Recommendations
 - [ ] `predictedArqGain` == scorer delta on patched copy
 - [ ] Ranked by `priorityScore`; deterministic

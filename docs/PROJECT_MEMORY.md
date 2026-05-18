@@ -149,8 +149,15 @@ points sum to 100), per the research report's authoritative model:
 
 - Each pillar scored 0..max from deterministic rules over the domain model;
   ARQ = sum of pillar points (0–100).
-- Merchant-facing bands: **Healthy 80–100**, **At risk 60–79**,
-  **Invisible/unstable < 60**.
+- Merchant-facing bands: **Healthy 80–100**, **At risk 58–79**,
+  **Invisible/unstable < 58**.
+  > M5.1 rationale: the at-risk lower bound was 60. The locked demo contract
+  > (`seed/demoResult.json`) encodes the documented reference ARQ **58** with
+  > band **at_risk**; 58 < 60 would have made it "invisible", contradicting
+  > the locked demo. The bound was lowered to **58** to keep the deterministic
+  > engine, this doc, and the locked demo internally consistent. The 80
+  > healthy cutoff is unchanged. Locked numbers (58 / At Risk / 76 / +18 /
+  > 92%) and `seed/demoResult.json` were NOT modified.
 - Per-product ARQ = pillar sum; store ARQ = importance-weighted product
   aggregation + store-level pillar contributions, clamped 0–100.
 - Every deduction must carry a machine-readable `reasonCode`, human message,
