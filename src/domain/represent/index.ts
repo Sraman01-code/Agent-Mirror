@@ -20,9 +20,11 @@ import type {
   StoreContextProfile,
 } from "./LlmClient";
 import { mockLlm } from "./mockLlm";
+import { makeAnthropicLlm } from "./anthropicLlm";
 
 export { mockLlm } from "./mockLlm";
 export { HONESTY_PREFIX } from "./mockLlm";
+export { makeAnthropicLlm } from "./anthropicLlm";
 export type { LlmClient } from "./LlmClient";
 
 // AI_PROMPTS.md "Canonical Shopper Question Set" — drives the evaluator and
@@ -132,4 +134,79 @@ export async function represent(
     context: buildContext(store, brief),
   });
   return [assessment];
+}
+
+// ── M4.2: env-gated client selection + degraded metadata ───────────────────
+
+export interface RepresentMeta {
+  degraded: true;
+  code: "LLM_DEGRADED";
+}
+
+export interface RepresentResult {
+  assessments: RepresentationAssessment[];
+  /** Present ONLY when the evaluator degraded to the deterministic mock. */
+  meta?: RepresentMeta;
+}
+
+/**
+ * Resolve which LlmClient to use from the environment, defaulting to the
+ * deterministic mock. Read at call time (NOT module load) so nothing
+ * network-related is constructed unless explicitly requested.
+ *
+ *  - AGENT_MIRROR_LLM unset / "mock"         → mockLlm (no network, no key)
+ *  - "anthropic" + missing/empty key         → mockLlm + degraded (expected)
+ *  - "anthropic" + key                       → anthropic adapter; if it fails
+ *                                              at runtime it falls back to
+ *                                              mock and flags degraded
+ */
+function resolveClient(onDegraded: (reason: string) => void): {
+  client: LlmClient;
+  degraded: boolean;
+} {
+  const mode = (process.env.AGENT_MIRROR_LLM ?? "mock").trim().toLowerCase();
+  if (mode !== "anthropic") {
+    return { client: mockLlm, degraded: false };
+  }
+  const key = process.env.ANTHROPIC_API_KEY;
+  if (!key || key.trim() === "") {
+    onDegraded("anthropic_missing_key");
+    return { client: mockLlm, degraded: true };
+  }
+  return {
+    client: makeAnthropicLlm({
+      apiKey: key,
+      fallback: mockLlm,
+      onDegraded,
+    }),
+    degraded: false,
+  };
+}
+
+/**
+ * Like represent(), but selects the client via AGENT_MIRROR_LLM and reports
+ * whether the result degraded to the deterministic mock (for API meta).
+ * An explicitly injected `opts.client` bypasses env selection (used by tests).
+ */
+export async function representWithMeta(
+  store: Store,
+  brief?: RepresentationBrief,
+  opts: RepresentOptions = {},
+): Promise<RepresentResult> {
+  if (opts.client) {
+    const assessments = await represent(store, brief, opts);
+    return { assessments };
+  }
+
+  let degraded = false;
+  const onDegraded = () => {
+    degraded = true;
+  };
+  const { client, degraded: selectionDegraded } = resolveClient(onDegraded);
+  if (selectionDegraded) degraded = true;
+
+  const assessments = await represent(store, brief, { ...opts, client });
+  return degraded
+    ? { assessments, meta: { degraded: true, code: "LLM_DEGRADED" } }
+    : { assessments };
 }

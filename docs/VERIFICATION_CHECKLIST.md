@@ -10,21 +10,19 @@ Status key: `[ ]` not done · `[x]` verified · `[~]` partial/blocked (add note)
 ---
 
 ## Global gates (re-run every milestone from M1.1)
-- [x] `npm run typecheck` passes  *(M1.1✓ · M1.2✓ · M2.1✓ · M2.2✓ · M3.1✓ ·
-  M4.1✓ clean)*
-- [x] `npm run lint` passes  *(M1.1✓ · M1.2✓ · M2.1✓ · M2.2✓ · M3.1✓ · M4.1✓
-  no warnings/errors; `next lint` deprecation notice is informational only,
-  migrate before Next 16)*
-- [x] `npm run build` passes  *(… · M3.1✓ · M4.1✓ — 9 routes (+/api/audit,
-  /api/represent); /dashboard still ○ static, 165 B / 106 kB byte-identical
-  vs M1.2)*
-- [x] `npm test` passes (from M3.1 on)  *(M3.1✓ Vitest 2.1.9, 6/6 audit ·
-  M4.1✓ +7 represent tests = 13/13 green)*
-- [x] No previously-checked item regressed  *(M4.1: represent port/mock/
-  pipeline/api/tests are additive; seed/demoResult.json + all 6 panels +
-  dashboard untouched; /dashboard still ○ static 165 B byte-identical; locked
-  demo numbers 58 / At Risk / 76 / +18 / 92% unchanged; M3.1 audit + M2.x
-  store/model APIs unaffected; all 13 tests green)*
+- [x] `npm run typecheck` passes  *(… · M3.1✓ · M4.1✓ · M4.2✓ clean)*
+- [x] `npm run lint` passes  *(… · M3.1✓ · M4.1✓ · M4.2✓ no warnings/errors;
+  `next lint` deprecation notice is informational only, migrate before Next 16)*
+- [x] `npm run build` passes  *(… · M4.1✓ · M4.2✓ — 9 routes; /dashboard still
+  ○ static, 165 B / 106 kB byte-identical vs M1.2)*
+- [x] `npm test` passes (from M3.1 on)  *(M3.1✓ 6/6 audit · M4.1✓ +7 represent
+  · M4.2✓ +8 factory/adapter = 21/21 green, zero network)*
+- [x] No previously-checked item regressed  *(M4.2: anthropic adapter +
+  factory are additive & env-gated; `represent()` unchanged so all 7 M4.1
+  tests stay green; default path still pure mock (verified byte-identical
+  store output, no meta); seed/demoResult.json + 6 panels + dashboard
+  untouched; /dashboard still ○ static 165 B byte-identical; locked demo
+  numbers 58 / At Risk / 76 / +18 / 92% unchanged; 21/21 tests, zero network)*
 - [x] Relevant `docs/*.md` updated in the same commit (docs-are-contracts)
 
 ---
@@ -107,8 +105,18 @@ Status key: `[ ]` not done · `[x]` verified · `[~]` partial/blocked (add note)
   the dashboard"). Pipeline + POST /api/represent are ready for later wiring;
   no checklist item depends on it and nothing regressed.
 ### M4.2 Anthropic adapter
-- [ ] Default `mock`, zero network in tests/CI
-- [ ] Missing key → mock fallback + `LLM_DEGRADED` meta
+- [x] Default `mock`, zero network in tests/CI  *(`makeAnthropicLlm` is
+  factory-built — nothing runs at module load, no key read unless explicitly
+  constructed; `representWithMeta` selects via `AGENT_MIRROR_LLM` (unset/
+  "mock" ⇒ mockLlm); 8 factory/adapter tests assert a no-network guard fetch
+  is never called on mock/missing-key paths and stub fetch on error paths —
+  21/21 green, zero real network; runtime: default POST /api/represent has no
+  meta and is deterministic)*
+- [x] Missing key → mock fallback + `LLM_DEGRADED` meta  *(`AGENT_MIRROR_LLM=
+  anthropic` + missing/empty key ⇒ mockLlm + `{degraded:true,code:
+  "LLM_DEGRADED"}`; adapter network/HTTP/parse errors (after 1 repair retry)
+  ⇒ same; never throws for normal use; honesty prefix enforced on all paths;
+  verified at runtime — assessments byte-identical to default mock output)*
 
 ## Phase 5 — Scoring + Recommendations
 ### M5.1 Scoring

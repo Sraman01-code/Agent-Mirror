@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import type { RepresentationBrief, Store } from "@/domain/model";
-import { represent } from "@/domain/represent";
+import { representWithMeta } from "@/domain/represent";
 
 // POST /api/represent  (API_PLAN.md, Phase 4)
 // Body: { store: Store, scope?: "store"|"product", entityId?, brief? }
-// Transport-only: validate → call the pure pipeline (deterministic mockLlm by
-// default, fully offline, no API key) → typed envelope. No scoring, no numbers
-// fed to ARQ. M4.2 will add the env-gated network adapter behind the port.
+// Transport-only: validate → call the pipeline (deterministic mockLlm by
+// default; env-gated Anthropic adapter via AGENT_MIRROR_LLM, M4.2) → typed
+// envelope. `meta.degraded`/`LLM_DEGRADED` is surfaced only when the evaluator
+// fell back to the mock. No scoring, no numbers fed to ARQ.
 
 function badInput(message: string) {
   return NextResponse.json(
@@ -58,7 +59,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const assessments = await represent(
+    const { assessments, meta } = await representWithMeta(
       store as Store,
       brief as RepresentationBrief | undefined,
       {
@@ -66,7 +67,11 @@ export async function POST(request: Request) {
         entityId: typeof entityId === "string" ? entityId : undefined,
       },
     );
-    return NextResponse.json({ ok: true, data: { assessments } });
+    return NextResponse.json({
+      ok: true,
+      data: { assessments },
+      ...(meta ? { meta } : {}),
+    });
   } catch (err) {
     return badInput(
       err instanceof Error ? err.message : "Unable to evaluate representation.",
