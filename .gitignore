@@ -27,6 +27,7 @@ Thumbs.db
 !.vscode/extensions.json
 
 # Claude Code machine-local settings (committed: .claude/settings.json only)
+.claude/
 .claude/settings.local.json
 
 # Test / coverage
