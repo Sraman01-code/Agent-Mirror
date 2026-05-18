@@ -10,15 +10,18 @@ Status key: `[ ]` not done · `[x]` verified · `[~]` partial/blocked (add note)
 ---
 
 ## Global gates (re-run every milestone from M1.1)
-- [x] `npm run typecheck` passes  *(M1.1✓ · M1.2✓ · M2.1✓ clean)*
-- [x] `npm run lint` passes  *(M1.1✓ · M1.2✓ · M2.1✓ no warnings/errors;
-  `next lint` deprecation notice is informational only, migrate before Next 16)*
-- [x] `npm run build` passes  *(M1.1✓ · M1.2✓ · M2.1✓ — 6 routes, /dashboard
-  static; bundle sizes unchanged vs M1.2)*
+- [x] `npm run typecheck` passes  *(M1.1✓ · M1.2✓ · M2.1✓ · M2.2✓ clean)*
+- [x] `npm run lint` passes  *(M1.1✓ · M1.2✓ · M2.1✓ · M2.2✓ no
+  warnings/errors; `next lint` deprecation notice is informational only,
+  migrate before Next 16)*
+- [x] `npm run build` passes  *(M1.1✓ · M1.2✓ · M2.1✓ · M2.2✓ — 7 routes
+  (+/api/store); /dashboard still ○ static, 165 B / 106 kB byte-identical
+  vs M1.2)*
 - [ ] `npm test` passes (from M3.1 on)
-- [x] No previously-checked item regressed  *(M2.1: domain model is types-only;
-  `components/types.ts` re-exports it, presentational view-model + seed JSON +
-  all 6 panels unchanged; /dashboard bundle byte-identical)*
+- [x] No previously-checked item regressed  *(M2.2: seed/demoResult.json + all
+  6 panels untouched; /dashboard reads typed Store via StoreSource but renders
+  the same name "Trailhead Supply Co." → identical static bundle; locked demo
+  numbers 58 / At Risk / 76 / +18 / 92% unchanged)*
 - [x] Relevant `docs/*.md` updated in the same commit (docs-are-contracts)
 
 ---
@@ -60,8 +63,14 @@ Status key: `[ ]` not done · `[x]` verified · `[~]` partial/blocked (add note)
   index.ts: all 27 canonical types + PILLAR_MAX (sums to 100); types-only,
   zero logic; re-exported via `@/components/types`; typecheck/lint/build green)*
 ### M2.2 Mock store + port
-- [ ] `GET /api/store` returns valid `Store`
-- [ ] Seed has ≥1 of every defect kind; deterministic (no Date/random)
+- [x] `GET /api/store` returns valid `Store`  *(envelope `{ok:true,data:Store}`;
+  source=mock, name "Trailhead Supply Co.", 10 products, hero aquatrail-pro;
+  `?source=shopify`→503 SOURCE_UNAVAILABLE, `?source=bogus`→400 BAD_INPUT)*
+- [x] Seed has ≥1 of every defect kind; deterministic (no Date/random)
+  *(all 8 kinds PASS — missing_field, thin_content, ambiguous_value,
+  contradiction, missing_attribute, unanswered_question, weak_differentiation,
+  trust_gap; two API calls byte-identical; StoreSource port + mockStore +
+  seed/demoStore.ts, no Date.now/Math.random/runtime IDs)*
 
 ## Phase 3 — Audit Engine
 ### M3.1 Detectors
