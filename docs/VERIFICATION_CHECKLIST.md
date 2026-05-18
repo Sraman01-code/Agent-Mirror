@@ -10,28 +10,31 @@ Status key: `[ ]` not done · `[x]` verified · `[~]` partial/blocked (add note)
 ---
 
 ## Global gates (re-run every milestone from M1.1)
-- [x] `npm run typecheck` passes  *(… · M5.2✓ · M6.1✓ · M7.1✓ clean)*
-- [x] `npm run lint` passes  *(… · M5.2✓ · M6.1✓ · M7.1✓ no warnings/errors;
+- [x] `npm run typecheck` passes  *(… · M6.1✓ · M7.1✓ · M8.1✓ clean)*
+- [x] `npm run lint` passes  *(… · M6.1✓ · M7.1✓ · M8.1✓ no warnings/errors;
   `next lint` deprecation notice is informational only, migrate before Next 16)*
-- [x] `npm run build` passes  *(… · M6.1✓ · M7.1✓ — 13 routes (+/api/report);
-  /dashboard still ○ static, 165 B / 106 kB byte-identical vs M1.2)*
+- [x] `npm run build` passes  *(… · M7.1✓ · M8.1✓ — 13 routes; /api/store
+  ƒ dynamic (mock default | read-only shopify); /dashboard still ○ static,
+  165 B / 106 kB byte-identical vs M1.2)*
 - [x] `npm test` passes (from M3.1 on)  *(M3.1✓ 6 audit · M4.1✓ +7 represent ·
   M4.2✓ +8 factory · M5.1✓ +9 scoring · M5.2✓ +12 recommend · M6.1✓ +8
-  simulate · M7.1✓ +7 report = 57/57 green, zero network)*
-- [x] No previously-checked item regressed  *(M7.1: report is additive &
-  pure — `buildReport` composes the EXISTING audit/score/represent/recommend/
-  simulate engines + the new deterministic `computeAcpPreview` (no duplicated
-  logic; numeric path zero-network — fetch-stub test asserts no call;
-  representation narrative via deterministic mockLlm only); all prior 50 tests
-  untouched & green (57/57 total); seed/demoStore.ts + seed/demoResult.json +
-  scoring constants + recommendation templates + M5.1 band + M6.1 curated
-  subset UNCHANGED; /dashboard still ○ static 165 B / 106 kB byte-identical
-  (ReportPanel gained optional override props defaulting to static data → DOM
-  unchanged; print CSS is `@media print` only → screen DOM/visuals identical;
-  no restyle, no other panel); live /api/report json+md deterministic &
-  matching, /api/simulate|recommend|score|represent|audit|store all unbroken;
-  locked demo numbers 58 / At Risk / 76 / +18 / 92% unchanged; no scope creep
-  (no Shopify / DB / PDF/email/storage / live ACP submit / M8.1))*
+  simulate · M7.1✓ +7 report · M8.1✓ +6 shopifyStore = 63/63 green, zero
+  network)*
+- [x] No previously-checked item regressed  *(M8.1: shopifyStore is additive &
+  read-only — `normalizeShopify` is pure (fixed GraphQL fixture → canonical
+  Store, deterministic); transport is injectable so tests make ZERO network
+  (stubbed fetch never called); admin token sent only in the request header,
+  never in Store/errors/logs (asserted); audit/score/recommend/simulate/
+  report engines + all prior 57 tests untouched & green (63/63 total);
+  seed/demoStore.ts + seed/demoResult.json + scoring constants + recommendation
+  templates + M5.1 band + M6.1 curated subset + M7.1 ACP schema UNCHANGED;
+  /dashboard still ○ static 165 B / 106 kB byte-identical (no panel/visual
+  change); GET /api/store default & ?source=mock byte-identical to M2.2,
+  ?source=shopify (no env) → 503 SOURCE_UNAVAILABLE (mock stays default),
+  ?source=bogus → 400 BAD_INPUT; /api/audit|score|recommend|simulate|report|
+  represent all unbroken; locked demo numbers 58 / At Risk / 76 / +18 / 92%
+  unchanged; no scope creep (no OAuth/App Bridge/billing/write-back/theme/
+  feeds/webhooks/DB/M9.1))*
 - [x] Relevant `docs/*.md` updated in the same commit (docs-are-contracts)
 
 ---
@@ -215,9 +218,28 @@ Status key: `[ ]` not done · `[x]` verified · `[~]` partial/blocked (add note)
 
 ## Phase 8 — Shopify Ingestion
 ### M8.1 shopifyStore
-- [ ] With env: normalized `Store` consumed unchanged downstream
-- [ ] Without env: `SOURCE_UNAVAILABLE`; mock path regression-free
-- [ ] No OAuth/billing/write-back/feeds/monitoring introduced
+- [x] With env: normalized `Store` consumed unchanged downstream  *(`make
+  ShopifyStore` (env or injected transport) → `normalizeShopify` maps a fixed
+  Admin GraphQL fixture to the canonical `Store` (handle→id, productType→
+  category, metafields→attributes, decimal price→minor units, compareAt,
+  image altText, variant availableForSale→available, shipping/refund policy →
+  PolicyDoc, shop metafield→sustainability); pure & deterministic (two runs
+  byte-identical); the normalized Store runs unchanged through audit → score →
+  recommend → simulate → buildReport in tests; `selectStoreSource("shopify")`
+  with env present returns the shopify adapter (id "shopify"))*
+- [x] Without env: `SOURCE_UNAVAILABLE`; mock path regression-free  *(`shopify
+  ConfigFromEnv()` null when either var missing → `selectStoreSource("shopify")`
+  = SOURCE_UNAVAILABLE; live GET /api/store?source=shopify → 503
+  SOURCE_UNAVAILABLE (no token leak); default & ?source=mock byte-identical to
+  M2.2 (trailhead-supply-co, 10 products, source mock; audit+score still
+  ARQ 58); ?source=bogus → 400 BAD_INPUT; mock remains the DEFAULT; 6/6
+  shopifyStore tests green; prior 57 tests unaffected (63/63))*
+- [x] No OAuth/billing/write-back/feeds/monitoring introduced  *(adapter is
+  strictly read-only: a single Admin GraphQL read query (shop+products),
+  injectable transport, no mutations/webhooks/themes/feeds/DB; token read
+  server-side only, sent only in `X-Shopify-Access-Token` header, never in
+  Store/error/log strings (asserted by test); env docs in README mark it a
+  read-only Custom App token, explicitly NOT OAuth; mock stays default)*
 
 ## Phase 9 — Demo Hardening
 ### M9.1

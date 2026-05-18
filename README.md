@@ -154,11 +154,23 @@ offline, identical output every run.
 |---|---|---|
 | `AGENT_MIRROR_LLM` | `mock` | `anthropic` enables the optional network adapter |
 | `ANTHROPIC_API_KEY` | _(unset)_ | Required only when `AGENT_MIRROR_LLM=anthropic` |
+| `SHOPIFY_STORE_DOMAIN` | _(unset)_ | e.g. `example.myshopify.com`; required for `GET /api/store?source=shopify` |
+| `SHOPIFY_ADMIN_TOKEN` | _(unset)_ | **Read-only Custom App Admin API access token** (NOT OAuth); required for `?source=shopify` |
 
 If `anthropic` is selected but the key is missing — or any network/parse
 error occurs — the evaluator transparently falls back to the deterministic
 mock and surfaces `meta: { degraded: true, code: "LLM_DEGRADED" }`. Secrets
 are read server-side only and never logged or returned.
+
+The **mock StoreSource is the default** and needs no env. `GET
+/api/store?source=shopify` uses a **read-only** Shopify Admin GraphQL adapter
+(M8.1): when both `SHOPIFY_STORE_DOMAIN` and `SHOPIFY_ADMIN_TOKEN` are set it
+returns the same canonical `Store` (consumed unchanged by audit/score/
+recommend/simulate/report); when either is missing it returns
+`SOURCE_UNAVAILABLE` and the mock stays default. This is **read-only
+ingestion only** — no OAuth, App Bridge, billing, write-back, theme mutation,
+feed submission, or webhooks. The admin token is sent only in the request
+header and never appears in any response, error, or log.
 
 ## Project structure
 
