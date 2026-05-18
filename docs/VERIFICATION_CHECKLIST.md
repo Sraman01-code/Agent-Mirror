@@ -10,19 +10,21 @@ Status key: `[ ]` not done · `[x]` verified · `[~]` partial/blocked (add note)
 ---
 
 ## Global gates (re-run every milestone from M1.1)
-- [x] `npm run typecheck` passes  *(M1.1✓ · M1.2✓ · M2.1✓ · M2.2✓ clean)*
-- [x] `npm run lint` passes  *(M1.1✓ · M1.2✓ · M2.1✓ · M2.2✓ no
-  warnings/errors; `next lint` deprecation notice is informational only,
+- [x] `npm run typecheck` passes  *(M1.1✓ · M1.2✓ · M2.1✓ · M2.2✓ · M3.1✓ ·
+  M4.1✓ clean)*
+- [x] `npm run lint` passes  *(M1.1✓ · M1.2✓ · M2.1✓ · M2.2✓ · M3.1✓ · M4.1✓
+  no warnings/errors; `next lint` deprecation notice is informational only,
   migrate before Next 16)*
-- [x] `npm run build` passes  *(M1.1✓ · M1.2✓ · M2.1✓ · M2.2✓ — 7 routes
-  (+/api/store); /dashboard still ○ static, 165 B / 106 kB byte-identical
+- [x] `npm run build` passes  *(… · M3.1✓ · M4.1✓ — 9 routes (+/api/audit,
+  /api/represent); /dashboard still ○ static, 165 B / 106 kB byte-identical
   vs M1.2)*
-- [x] `npm test` passes (from M3.1 on)  *(M3.1✓ — Vitest 2.1.9 added;
-  `npm test` = `vitest run`; 6/6 audit tests green)*
-- [x] No previously-checked item regressed  *(M3.1: detectors/audit/api/tests
-  are additive; seed/demoResult.json + all 6 panels + dashboard untouched;
-  /dashboard still ○ static 165 B byte-identical; locked demo numbers 58 /
-  At Risk / 76 / +18 / 92% unchanged; M2.1/M2.2 store+model APIs unaffected)*
+- [x] `npm test` passes (from M3.1 on)  *(M3.1✓ Vitest 2.1.9, 6/6 audit ·
+  M4.1✓ +7 represent tests = 13/13 green)*
+- [x] No previously-checked item regressed  *(M4.1: represent port/mock/
+  pipeline/api/tests are additive; seed/demoResult.json + all 6 panels +
+  dashboard untouched; /dashboard still ○ static 165 B byte-identical; locked
+  demo numbers 58 / At Risk / 76 / +18 / 92% unchanged; M3.1 audit + M2.x
+  store/model APIs unaffected; all 13 tests green)*
 - [x] Relevant `docs/*.md` updated in the same commit (docs-are-contracts)
 
 ---
@@ -92,7 +94,18 @@ Status key: `[ ]` not done · `[x]` verified · `[~]` partial/blocked (add note)
 
 ## Phase 4 — Representation Evaluator
 ### M4.1 Port + mock
-- [ ] `mockLlm` deterministic; `/api/represent` works offline
+- [x] `mockLlm` deterministic; `/api/represent` works offline  *(LlmClient
+  port + pure rules-based mockLlm per AI_PROMPTS §5; `represent()` pipeline +
+  POST /api/represent return valid `RepresentationAssessment[]` conforming to
+  DATA_MODEL §4 — 8 canonical questions in order, confidence 0..1,
+  misrepresentationRisk enum, summary present; byte-identical across runs
+  (store & product) verified via test + live API, zero network/key; honesty
+  rule enforced (HONESTY_PREFIX, no real-engine claims); BAD_INPUT on bad
+  body; no ARQ/score emitted — LLM advisory only; 7/7 unit tests green)*
+- [~] Mirror panel "data-driven from RepresentationAssessment": deliberately
+  deferred by operator scope (M4.1 task = port+mock+API+tests; "do not change
+  the dashboard"). Pipeline + POST /api/represent are ready for later wiring;
+  no checklist item depends on it and nothing regressed.
 ### M4.2 Anthropic adapter
 - [ ] Default `mock`, zero network in tests/CI
 - [ ] Missing key → mock fallback + `LLM_DEGRADED` meta
