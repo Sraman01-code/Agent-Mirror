@@ -10,16 +10,16 @@ Status key: `[ ]` not done · `[x]` verified · `[~]` partial/blocked (add note)
 ---
 
 ## Global gates (re-run every milestone from M1.1)
-- [x] `npm run typecheck` passes  *(… · M6.1✓ · M7.1✓ · M8.1✓ clean)*
-- [x] `npm run lint` passes  *(… · M6.1✓ · M7.1✓ · M8.1✓ no warnings/errors;
+- [x] `npm run typecheck` passes  *(… · M7.1✓ · M8.1✓ · M9.1✓ clean)*
+- [x] `npm run lint` passes  *(… · M7.1✓ · M8.1✓ · M9.1✓ no warnings/errors;
   `next lint` deprecation notice is informational only, migrate before Next 16)*
-- [x] `npm run build` passes  *(… · M7.1✓ · M8.1✓ — 13 routes; /api/store
-  ƒ dynamic (mock default | read-only shopify); /dashboard still ○ static,
-  165 B / 106 kB byte-identical vs M1.2)*
+- [x] `npm run build` passes  *(… · M8.1✓ · M9.1✓ — 13 routes; / & /dashboard
+  still ○ statically prerendered (server components only, no client JS added;
+  M9.1 visual overhaul is HTML/CSS — page-level JS payload unchanged))*
 - [x] `npm test` passes (from M3.1 on)  *(M3.1✓ 6 audit · M4.1✓ +7 represent ·
   M4.2✓ +8 factory · M5.1✓ +9 scoring · M5.2✓ +12 recommend · M6.1✓ +8
-  simulate · M7.1✓ +7 report · M8.1✓ +6 shopifyStore = 63/63 green, zero
-  network)*
+  simulate · M7.1✓ +7 report · M8.1✓ +6 shopifyStore · M9.1✓ presentational
+  only, no test delta = 63/63 green, zero network)*
 - [x] No previously-checked item regressed  *(M8.1: shopifyStore is additive &
   read-only — `normalizeShopify` is pure (fixed GraphQL fixture → canonical
   Store, deterministic); transport is injectable so tests make ZERO network
@@ -243,6 +243,26 @@ Status key: `[ ]` not done · `[x]` verified · `[~]` partial/blocked (add note)
 
 ## Phase 9 — Demo Hardening
 ### M9.1
-- [ ] DEMO_SCRIPT.md runs ≤6 min, no dead ends
-- [ ] Locked demo numbers match (Before 58 / After 76 / Δ+18; Intent 3→9; ACP 92%)
-- [ ] Entire checklist green; failure drills pass
+- [x] Frontend design polish (this pass)  *(cohesive "telemetry/observatory"
+  identity: ink palette + amber=At Risk / lime=target signal logic, serif
+  display + monospace instrumentation, atmospheric CSS-only background.
+  Reusable primitives: `Panel`, `Meter`, redesigned `ScoreGauge`
+  (gradient arc + tick ring + bloom, reduced-motion safe), `DeltaBar`
+  (58→76 climb), `SeverityPill`. Landing rebuilt (positioning, CTA,
+  explicit "not an SEO scanner / data fetcher / vanity dashboard" trio);
+  dashboard gains a header ARQ chip + sticky 6-step nav; all 6 panels
+  restyled with grouped findings, an impact/effort/confidence action
+  queue, a satisfying before→after, and a real Markdown/JSON export CTA
+  to the existing /api/report routes. Tailwind-only, no new deps, no
+  client JS — `/` & `/dashboard` stay statically prerendered;
+  prefers-reduced-motion respected; mobile stacks via responsive grids)*
+- [x] Locked demo numbers match (Before 58 / At Risk / After 76 / Δ+18; ACP
+  92%)  *(verified in rendered /dashboard HTML and live GET
+  /api/report?format=json|md — arq 58, band at_risk, after 76, delta 18,
+  ACP 92%; seed/demoResult.json + demoStore + scoring constants + recommend
+  templates + M6.1 curated subset + M7.1 ACP schema untouched; "+18"/"92%"
+  appear split only by React text-node boundaries — values render correctly;
+  63/63 tests green incl. report arq-58/acp-92 + scoring 58 snapshot)*
+- [ ] DEMO_SCRIPT.md full ≤6-min rehearsal + failure drills + whole-checklist
+  sign-off  *(remaining demo-hardening scope — beyond this frontend-polish
+  pass; loading/empty/error states + scripted rehearsal still to do)*

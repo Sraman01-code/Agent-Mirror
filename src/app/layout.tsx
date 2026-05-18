@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Agent Mirror",
+  title: "Agent Mirror — AI Representation Optimizer for Shopify",
   description:
-    "Shopify-native AI Representation Optimizer — see how AI shopping agents represent your store, and fix it.",
+    "See how AI shopping agents are likely to represent your Shopify store, what is missing or risky, and which fixes raise AI Representation Quality fastest.",
 };
 
 export default function RootLayout({
@@ -12,7 +12,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-neutral-950 text-neutral-100 antialiased">
+      <body className="min-h-screen font-sans text-ink antialiased">
         {children}
       </body>
     </html>

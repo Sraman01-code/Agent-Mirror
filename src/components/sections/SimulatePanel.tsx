@@ -1,41 +1,45 @@
 import type { DemoResult } from "@/components/types";
+import { Panel } from "@/components/primitives/Panel";
 import { DeltaBar } from "@/components/primitives/DeltaBar";
 
-// M6.1 wiring: the panel is unchanged for the static demo (it renders the
-// curated before/after, which the deterministic M6.1 engine reproduces
-// EXACTLY — base 58 → after 76, Δ+18, band At Risk, via the priority-ranked
-// curated subset clarify-return-policy + add-shipping-details +
-// add-product-specs). For interactive use, a parent inside a
-// <SimulationProvider> may pass `simulation` to drive the same view from a
-// live `POST /api/simulate` SimulationResult. When omitted, output is
-// byte-identical to M1.2 (no restyle, no number change, no other panel).
+// M9.1 polish; M6.1 wiring contract preserved: the panel renders the curated
+// before/after (which the deterministic engine reproduces exactly — 58 → 76,
+// Δ+18, band At Risk). A parent inside a <SimulationProvider> may pass a live
+// `simulation` override; when omitted the static seed value is used.
 export function SimulatePanel({
   data,
   simulation: override,
+  index = 4,
 }: {
   data: DemoResult;
   simulation?: DemoResult["simulation"];
+  index?: number;
 }) {
   const simulation = override ?? data.simulation;
   const sample = simulation.sampleAnswers[0];
+  const planById = new Map(data.plan.map((r) => [r.id, r]));
+  const applied = simulation.appliedRecommendationIds
+    .map((id) => planById.get(id))
+    .filter(Boolean) as DemoResult["plan"];
 
   return (
-    <section className="rounded-2xl border border-neutral-800 bg-neutral-900/60 p-6">
-      <header className="mb-5">
-        <p className="text-xs font-semibold uppercase tracking-widest text-emerald-400">
-          Step 5 · Simulate — prove the lift
-        </p>
-        <h2 className="mt-1 text-xl font-semibold">
-          Before / after representation
-        </h2>
-      </header>
-
-      <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
-        <div className="rounded-xl border border-neutral-800 bg-neutral-950/50 p-5">
-          <DeltaBar before={simulation.before.arq} after={simulation.after.arq} />
+    <Panel
+      id="simulate"
+      step={5}
+      index={index}
+      kicker="Simulate — prove the lift"
+      title="Before / after representation"
+      subtitle="Apply the curated top fixes, re-audit, re-score. Deterministic and rehearsable."
+    >
+      <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
+        <div className="flex items-center justify-center rounded-xl border border-line bg-surface-sunk p-6">
+          <DeltaBar
+            before={simulation.before.arq}
+            after={simulation.after.arq}
+          />
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           {simulation.after.pillars.map((ap) => {
             const bp = simulation.before.pillars.find(
               (x) => x.pillar === ap.pillar,
@@ -45,13 +49,17 @@ export function SimulatePanel({
             return (
               <div
                 key={ap.pillar}
-                className="flex items-center justify-between rounded-lg border border-neutral-800 bg-neutral-950/40 px-4 py-2 text-sm"
+                className="flex items-center justify-between rounded-lg border border-line bg-surface px-4 py-2.5 text-sm"
               >
-                <span className="text-neutral-300">{ap.label}</span>
-                <span className="tabular-nums text-neutral-400">
-                  {from} → {ap.score}
+                <span className="text-ink-muted">{ap.label}</span>
+                <span className="flex items-center gap-2 font-mono text-xs">
+                  <span className="text-ink-faint">{from}</span>
+                  <span className="text-ink-faint">→</span>
+                  <span className="text-ink">{ap.score}</span>
                   {gain > 0 && (
-                    <span className="ml-2 text-emerald-400">+{gain}</span>
+                    <span className="rounded bg-signal-good/15 px-1.5 py-0.5 text-signal-good">
+                      +{gain}
+                    </span>
                   )}
                 </span>
               </div>
@@ -60,37 +68,56 @@ export function SimulatePanel({
         </div>
       </div>
 
-      <div className="mt-5 rounded-xl border border-neutral-800 bg-neutral-950/50 p-5">
-        <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500">
-          What drove the improvement
+      <div className="mt-5 rounded-xl border border-line bg-surface-sunk p-5">
+        <p className="font-mono text-[0.66rem] uppercase tracking-kicker text-ink-faint">
+          Selected fixes applied
         </p>
-        <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-neutral-300">
-          {simulation.drivers.map((d) => (
-            <li key={d}>{d}</li>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {applied.map((r) => (
+            <span
+              key={r.id}
+              className="inline-flex items-center gap-2 rounded-full border border-signal-good/25 bg-signal-good/[0.06] px-3 py-1 text-xs text-ink"
+            >
+              <span className="text-signal-good">✓</span>
+              {r.title}
+              <span className="font-mono text-[0.66rem] text-signal-good">
+                +{r.predictedArqGain}
+              </span>
+            </span>
           ))}
-        </ul>
+        </div>
+        {simulation.drivers.length > 0 && (
+          <ul className="mt-4 space-y-1.5 text-sm text-ink-muted">
+            {simulation.drivers.map((d) => (
+              <li key={d} className="flex gap-2">
+                <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-signal-good" />
+                {d}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       {sample && (
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
-          <div className="rounded-xl border border-red-500/20 bg-red-500/[0.04] p-5">
-            <p className="text-xs font-semibold uppercase tracking-widest text-red-400">
-              Before
+        <div className="mt-4 grid gap-px overflow-hidden rounded-xl border border-line bg-line md:grid-cols-2">
+          <div className="bg-signal-risk/[0.05] p-5">
+            <p className="font-mono text-[0.66rem] uppercase tracking-kicker text-signal-risk">
+              Before · hedged
             </p>
-            <p className="mt-2 text-sm italic text-neutral-300">
+            <p className="mt-2 text-sm italic leading-relaxed text-ink-muted">
               “{sample.before}”
             </p>
           </div>
-          <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04] p-5">
-            <p className="text-xs font-semibold uppercase tracking-widest text-emerald-400">
-              After
+          <div className="bg-signal-good/[0.05] p-5">
+            <p className="font-mono text-[0.66rem] uppercase tracking-kicker text-signal-good">
+              After · confident
             </p>
-            <p className="mt-2 text-sm italic text-neutral-300">
+            <p className="mt-2 text-sm italic leading-relaxed text-ink">
               “{sample.after}”
             </p>
           </div>
         </div>
       )}
-    </section>
+    </Panel>
   );
 }

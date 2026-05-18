@@ -1,90 +1,147 @@
 import type { DemoResult, QuestionCoverageItem } from "@/components/types";
 import { COVERAGE_LABEL } from "@/components/types";
+import { Panel } from "@/components/primitives/Panel";
 
 const COVERAGE_STYLE: Record<QuestionCoverageItem["status"], string> = {
-  answered: "bg-emerald-500/15 text-emerald-400",
-  partially_answered: "bg-amber-500/15 text-amber-400",
-  unanswered: "bg-red-500/15 text-red-400",
+  answered: "bg-signal-good/15 text-signal-good",
+  partially_answered: "bg-signal-warn/15 text-signal-warn",
+  unanswered: "bg-signal-risk/15 text-signal-risk",
 };
 
-// M7.1 wiring: the panel is unchanged for the static demo (it renders the
-// seed ACP 92% / question coverage / honesty note, which the deterministic
-// M7.1 report assembler reproduces — ACP coverage = 92, ARQ 58 → 76 Δ+18,
-// canonical 8-question coverage). For interactive/export use, a parent may
-// pass live overrides driven by GET /api/report; when omitted, output is
-// byte-identical to M1.2 (no restyle, no number change, no other panel).
+// M9.1 polish; M7.1 contract preserved (optional live overrides default to
+// the static seed). Adds a real export CTA — the /api/report routes exist.
 export function ReportPanel({
   data,
   acpPreview: acpOverride,
   questionCoverage: qcOverride,
   honestyNote: noteOverride,
+  index = 5,
 }: {
   data: DemoResult;
   acpPreview?: DemoResult["acpPreview"];
   questionCoverage?: DemoResult["questionCoverage"];
   honestyNote?: string;
+  index?: number;
 }) {
   const acpPreview = acpOverride ?? data.acpPreview;
   const questionCoverage = qcOverride ?? data.questionCoverage;
   const honestyNote = noteOverride ?? data.honestyNote;
+
   const counts = questionCoverage.reduce<Record<string, number>>((acc, q) => {
     acc[q.status] = (acc[q.status] ?? 0) + 1;
     return acc;
   }, {});
 
-  return (
-    <section className="rounded-2xl border border-neutral-800 bg-neutral-900/60 p-6">
-      <header className="mb-5">
-        <p className="text-xs font-semibold uppercase tracking-widest text-emerald-400">
-          Step 6 · Report — share &amp; export
-        </p>
-        <h2 className="mt-1 text-xl font-semibold">
-          Buyer-question coverage &amp; export readiness
-        </h2>
-      </header>
+  const r = 34;
+  const c = 2 * Math.PI * r;
+  const off = c * (1 - acpPreview.coveragePct / 100);
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-xl border border-neutral-800 bg-neutral-950/50 p-5">
-          <div className="flex items-baseline justify-between">
-            <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500">
-              ACP / export field coverage
-            </p>
-            <span className="text-3xl font-semibold tabular-nums text-emerald-400">
-              {acpPreview.coveragePct}%
-            </span>
+  return (
+    <Panel
+      id="report"
+      step={6}
+      index={index}
+      kicker="Report — share & export"
+      title="Buyer-question coverage & export readiness"
+      subtitle="Hand this to the team or agency — exportable, and honest about what it measures."
+      meta={
+        <div className="flex gap-2">
+          <a
+            href="/api/report?format=md"
+            className="rounded-full bg-signal-warn px-4 py-2 text-xs font-semibold text-[#1a1206] transition hover:brightness-110"
+          >
+            Export Markdown
+          </a>
+          <a
+            href="/api/report?format=json"
+            className="rounded-full border border-line bg-surface-raised px-4 py-2 text-xs font-medium text-ink-muted transition hover:text-ink"
+          >
+            JSON
+          </a>
+        </div>
+      }
+    >
+      <div className="grid gap-5 lg:grid-cols-2">
+        <div className="rounded-xl border border-line bg-surface-sunk p-6">
+          <div className="flex items-center gap-5">
+            <div className="relative h-[88px] w-[88px] shrink-0">
+              <svg
+                width="88"
+                height="88"
+                viewBox="0 0 88 88"
+                className="-rotate-90"
+                role="img"
+                aria-label={`ACP feed coverage ${acpPreview.coveragePct} percent`}
+              >
+                <circle
+                  cx="44"
+                  cy="44"
+                  r={r}
+                  stroke="var(--surface-sunk)"
+                  strokeWidth="9"
+                  fill="none"
+                />
+                <circle
+                  cx="44"
+                  cy="44"
+                  r={r}
+                  stroke="rgb(var(--signal-good))"
+                  strokeWidth="9"
+                  strokeLinecap="round"
+                  fill="none"
+                  strokeDasharray={c}
+                  strokeDashoffset={off}
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center font-display text-xl tabular text-ink">
+                {acpPreview.coveragePct}%
+              </div>
+            </div>
+            <div>
+              <p className="font-mono text-[0.66rem] uppercase tracking-kicker text-ink-faint">
+                ACP / export field coverage
+              </p>
+              <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">
+                {acpPreview.submissionNote}
+              </p>
+            </div>
           </div>
-          <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-neutral-800">
-            <div
-              className="h-full rounded-full bg-emerald-400"
-              style={{ width: `${acpPreview.coveragePct}%` }}
-            />
-          </div>
-          <p className="mt-3 text-xs text-neutral-500">
-            {acpPreview.submissionNote}
-          </p>
-          <div className="mt-4 space-y-2 text-sm">
-            <p className="text-neutral-400">Warnings</p>
-            <ul className="list-disc space-y-1 pl-5 text-neutral-300">
-              {acpPreview.warnings.map((w) => (
-                <li key={w}>{w}</li>
-              ))}
-            </ul>
-            <p className="pt-2 text-neutral-400">Missing fields</p>
-            <ul className="space-y-1 text-neutral-300">
-              {acpPreview.missingFields.map((m) => (
-                <li key={m.productId} className="font-mono text-xs">
-                  {m.productId}: {m.fields.join(", ")}
-                </li>
-              ))}
-            </ul>
+
+          <div className="mt-5 space-y-3 text-sm">
+            <div>
+              <p className="font-mono text-[0.62rem] uppercase tracking-wide text-ink-faint">
+                Warnings
+              </p>
+              <ul className="mt-1.5 space-y-1 text-ink-muted">
+                {acpPreview.warnings.map((w) => (
+                  <li key={w} className="flex gap-2">
+                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-signal-warn" />
+                    {w}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="font-mono text-[0.62rem] uppercase tracking-wide text-ink-faint">
+                Missing fields
+              </p>
+              <ul className="mt-1.5 space-y-1 font-mono text-xs text-ink-muted">
+                {acpPreview.missingFields.map((m) => (
+                  <li key={m.productId}>
+                    <span className="text-ink">{m.productId}</span> ·{" "}
+                    {m.fields.join(", ")}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
 
-        <div className="rounded-xl border border-neutral-800 bg-neutral-950/50 p-5">
-          <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500">
+        <div className="rounded-xl border border-line bg-surface-sunk p-6">
+          <p className="font-mono text-[0.66rem] uppercase tracking-kicker text-ink-faint">
             Buyer question coverage
           </p>
-          <div className="mt-3 flex gap-2">
+          <div className="mt-3 flex flex-wrap gap-2">
             {(
               ["answered", "partially_answered", "unanswered"] as const
             ).map((s) => (
@@ -92,31 +149,36 @@ export function ReportPanel({
                 key={s}
                 className={`rounded-full px-3 py-1 text-xs font-medium ${COVERAGE_STYLE[s]}`}
               >
-                {COVERAGE_LABEL[s]}: {counts[s] ?? 0}
+                {COVERAGE_LABEL[s]} · {counts[s] ?? 0}
               </span>
             ))}
           </div>
-          <ul className="mt-4 divide-y divide-neutral-800">
+          <ul className="mt-4 divide-y divide-line">
             {questionCoverage.map((q) => (
-              <li key={q.questionId} className="py-3 text-sm">
+              <li key={q.questionId} className="py-3">
                 <div className="flex items-start justify-between gap-3">
-                  <span className="text-neutral-200">{q.questionText}</span>
+                  <span className="text-sm text-ink">{q.questionText}</span>
                   <span
-                    className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${COVERAGE_STYLE[q.status]}`}
+                    className={`shrink-0 rounded-full px-2 py-0.5 text-[0.66rem] font-medium ${COVERAGE_STYLE[q.status]}`}
                   >
                     {COVERAGE_LABEL[q.status]}
                   </span>
                 </div>
-                <p className="mt-1 text-xs text-neutral-500">{q.bestAnswer}</p>
+                <p className="mt-1 text-xs leading-relaxed text-ink-faint">
+                  {q.bestAnswer}
+                </p>
               </li>
             ))}
           </ul>
         </div>
       </div>
 
-      <p className="mt-5 rounded-lg border border-neutral-800 bg-neutral-950/40 p-3 text-xs text-neutral-500">
+      <p className="mt-5 flex gap-3 rounded-xl border border-line bg-surface px-4 py-3 text-xs leading-relaxed text-ink-faint">
+        <span aria-hidden className="select-none text-ink-muted">
+          ⓘ
+        </span>
         {honestyNote}
       </p>
-    </section>
+    </Panel>
   );
 }

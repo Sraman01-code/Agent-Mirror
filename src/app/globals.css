@@ -2,8 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ───────────────────────────────────────────────────────────────────────────
+   Agent Mirror — M9.1 visual identity.
+   "Telemetry / observatory": deep ink, editorial serif voice, monospace
+   instrumentation, amber = At Risk state, lime = the target/after payoff.
+   System-font stacks (no network fetch) so the static demo builds & runs
+   fully offline and deterministically.
+   ─────────────────────────────────────────────────────────────────────── */
+
 :root {
   color-scheme: dark;
+
+  --font-display: "Iowan Old Style", "Palatino Linotype", "Palatino",
+    "Book Antiqua", Georgia, "Times New Roman", serif;
+  --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code",
+    "Roboto Mono", Menlo, Consolas, monospace;
+
+  --bg: #08090c;
+
+  /* RGB channel triplets so Tailwind alpha modifiers (e.g. /15) work via
+     rgb(var(--token) / <alpha-value>) — see tailwind.config.ts. */
+  --ink: 237 236 242;
+  --ink-muted: 155 155 168;
+  --ink-faint: 106 106 120;
+
+  --signal-risk: 255 107 107; /* critical / risk */
+  --signal-high: 255 149 92; /* high severity */
+  --signal-warn: 236 178 62; /* At Risk band — the dominant accent */
+  --signal-good: 174 224 106; /* healthy / after / target payoff */
+  --signal-cool: 116 199 236; /* quick win / informational */
+
+  /* Pre-mixed surfaces/lines used without an alpha modifier. */
+  --surface: rgba(255, 255, 255, 0.025);
+  --surface-raised: rgba(255, 255, 255, 0.045);
+  --surface-sunk: rgba(0, 0, 0, 0.32);
+  --line: rgba(255, 255, 255, 0.09);
+
+  --glow: rgba(236, 178, 62, 0.5);
 }
 
 html,
@@ -12,15 +49,97 @@ body {
   margin: 0;
 }
 
-/* M7.1: print-only polish so the on-screen report is legible when printed
-   (PROJECT_MEMORY §5 report/export preview). Screen rendering is untouched —
-   these rules apply only in print, so the static dashboard DOM/visuals stay
-   byte-identical. No app redesign. */
+body {
+  background-color: var(--bg);
+  color: rgb(var(--ink));
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* Layered atmosphere: warm amber bloom top, cool lime echo bottom, a
+     barely-there engineering grid, and a fixed vignette. CSS only. */
+  background-image:
+    radial-gradient(
+      52rem 38rem at 12% -8%,
+      rgba(236, 178, 62, 0.13),
+      transparent 60%
+    ),
+    radial-gradient(
+      48rem 40rem at 110% 112%,
+      rgba(174, 224, 106, 0.1),
+      transparent 55%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.018) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.018) 1px,
+      transparent 1px
+    );
+  background-size: 100% 100%, 100% 100%, 100% 3.25rem, 3.25rem 100%;
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+::selection {
+  background: rgba(236, 178, 62, 0.28);
+  color: #fff;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+}
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 9999px;
+}
+
+.font-display {
+  font-feature-settings: "liga" 1, "dlig" 1;
+}
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Hairline that reads as an instrument seam, used by the Mirror split. */
+.seam {
+  background-image: linear-gradient(
+    to bottom,
+    transparent,
+    var(--line) 12%,
+    var(--line) 88%,
+    transparent
+  );
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--signal-warn);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* M7.1 print polish (kept): the report stays legible on paper. */
 @media print {
   :root {
     color-scheme: light;
   }
-  html,
   body {
     background: #ffffff !important;
     color: #111111 !important;
@@ -33,5 +152,6 @@ body {
     break-inside: avoid;
     border-color: #cccccc !important;
     background: #ffffff !important;
+    box-shadow: none !important;
   }
 }
