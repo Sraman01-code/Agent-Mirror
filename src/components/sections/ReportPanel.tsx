@@ -173,8 +173,8 @@ export function ReportPanel({
         </div>
       </div>
 
-      <p className="mt-5 flex gap-3 rounded-xl border border-line bg-surface px-4 py-3 text-xs leading-relaxed text-ink-faint">
-        <span aria-hidden className="select-none text-ink-muted">
+      <p className="mt-5 flex gap-3 rounded-xl border border-line bg-surface px-4 py-3 text-xs leading-relaxed text-ink-muted">
+        <span aria-hidden className="select-none text-signal-cool">
           ⓘ
         </span>
         {honestyNote}

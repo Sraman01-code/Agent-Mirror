@@ -13,13 +13,14 @@ Status key: `[ ]` not done · `[x]` verified · `[~]` partial/blocked (add note)
 - [x] `npm run typecheck` passes  *(… · M7.1✓ · M8.1✓ · M9.1✓ clean)*
 - [x] `npm run lint` passes  *(… · M7.1✓ · M8.1✓ · M9.1✓ no warnings/errors;
   `next lint` deprecation notice is informational only, migrate before Next 16)*
-- [x] `npm run build` passes  *(… · M8.1✓ · M9.1✓ — 13 routes; / & /dashboard
-  still ○ statically prerendered (server components only, no client JS added;
-  M9.1 visual overhaul is HTML/CSS — page-level JS payload unchanged))*
+- [x] `npm run build` passes  *(… · M9.1✓ · M9.1-hardening✓ — 13 routes +
+  static /_not-found; / & /dashboard still ○ statically prerendered (server
+  components; error.tsx/loading.tsx are lazy boundaries that don't change the
+  static prerender; page-level JS payload unchanged))*
 - [x] `npm test` passes (from M3.1 on)  *(M3.1✓ 6 audit · M4.1✓ +7 represent ·
   M4.2✓ +8 factory · M5.1✓ +9 scoring · M5.2✓ +12 recommend · M6.1✓ +8
-  simulate · M7.1✓ +7 report · M8.1✓ +6 shopifyStore · M9.1✓ presentational
-  only, no test delta = 63/63 green, zero network)*
+  simulate · M7.1✓ +7 report · M8.1✓ +6 shopifyStore · M9.1✓ presentational ·
+  M9.1-hardening✓ +2 demoLock = 65/65 green, zero network)*
 - [x] No previously-checked item regressed  *(M8.1: shopifyStore is additive &
   read-only — `normalizeShopify` is pure (fixed GraphQL fixture → canonical
   Store, deterministic); transport is injectable so tests make ZERO network
@@ -261,8 +262,33 @@ Status key: `[ ]` not done · `[x]` verified · `[~]` partial/blocked (add note)
   /api/report?format=json|md — arq 58, band at_risk, after 76, delta 18,
   ACP 92%; seed/demoResult.json + demoStore + scoring constants + recommend
   templates + M6.1 curated subset + M7.1 ACP schema untouched; "+18"/"92%"
-  appear split only by React text-node boundaries — values render correctly;
-  63/63 tests green incl. report arq-58/acp-92 + scoring 58 snapshot)*
-- [ ] DEMO_SCRIPT.md full ≤6-min rehearsal + failure drills + whole-checklist
-  sign-off  *(remaining demo-hardening scope — beyond this frontend-polish
-  pass; loading/empty/error states + scripted rehearsal still to do)*
+  split only by React text-node boundaries — values render correctly. A new
+  `src/__tests__/demoLock.test.ts` (2 tests) now pins BOTH the static seed
+  literals AND the live engine output (audit/score + buildReport) to the
+  locked figures so they can never silently drift; 65/65 green)*
+- [x] DEMO_SCRIPT.md runs ≤6 min, no dead ends  *(beat-by-beat live
+  rehearsal — Beat 0 `/` (positioning + "Load the demo store" CTA + visible
+  honesty + seed-lock copy + skip link); Beats 1–5 `/dashboard` (all six
+  section landmarks `#connect/#mirror/#diagnose/#plan/#simulate/#report` +
+  `<main id=content>` present, sticky step nav, ARQ 58/At Risk chip);
+  Beat 5 export CTA → live /api/report?format=md|json 200. Off-ramps added so
+  no path dead-ends: `not-found.tsx` (404 → "Open the report"), `error.tsx`
+  (recoverable client boundary, error path only), `dashboard/loading.tsx`
+  skeleton. a11y: skip link, banner/nav/main/footer landmarks, ARIA labels on
+  gauges/nav, essential copy lifted off `ink-faint` for contrast,
+  prefers-reduced-motion already global)*
+- [x] Failure drills pass  *(1 — LLM down: prod server run with
+  `AGENT_MIRROR_LLM=anthropic` and NO key → POST /api/represent still 200
+  `ok:true` with `meta {degraded:true, code:"LLM_DEGRADED"}` and a full mock
+  assessment; demo unaffected. 2 — refresh mid-demo: /api/report json
+  byte-identical across calls (computedAt excluded) and /dashboard HTML
+  identical; deterministic. 3 — skip Simulate: /api/report?format=md is
+  coherent with every locked token and the dashboard Report section +
+  export CTA stand alone with no required prior interaction)*
+- [x] Entire checklist green; no prior milestone regressed  *(M1.1→M8.1 boxes
+  all remain checked; M9.1 + hardening additive & presentational/resilience
+  only — domain engines, seed, scoring constants, recommend templates, M5.1
+  band, M6.1 curated subset, M7.1 ACP schema all untouched; 65/65 tests
+  green; / & /dashboard still ○ statically prerendered; every API route
+  verified live (health/store[+shopify 503/+bogus 400]/audit/represent/
+  score/recommend/simulate/report json+md))*

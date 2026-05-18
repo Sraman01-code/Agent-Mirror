@@ -26,7 +26,10 @@ const STEPS = [
 
 export default function Home() {
   return (
-    <main className="relative mx-auto flex min-h-screen max-w-5xl flex-col justify-center px-6 py-20">
+    <main
+      id="content"
+      className="relative mx-auto flex min-h-screen max-w-5xl flex-col justify-center px-6 py-20"
+    >
       <p className="animate-rise flex items-center gap-3 font-mono text-[0.7rem] uppercase tracking-kicker text-signal-warn">
         <span className="h-px w-8 bg-signal-warn/50" />
         Agent Mirror · AI Representation Optimizer for Shopify
@@ -64,8 +67,8 @@ export default function Home() {
             →
           </span>
         </Link>
-        <span className="font-mono text-xs text-ink-faint">
-          Trailhead Supply Co. · 10 SKUs · deterministic seed
+        <span className="font-mono text-xs text-ink-muted">
+          Trailhead Supply Co. · 10 SKUs · locked, rehearsable seed
         </span>
       </div>
 
@@ -97,6 +100,16 @@ export default function Home() {
           </span>
         ))}
       </div>
+
+      <p
+        className="animate-rise mt-10 max-w-2xl text-xs leading-relaxed text-ink-muted"
+        style={{ animationDelay: "460ms" }}
+      >
+        Evidence-based simulation of the <em>likely</em> AI representation from
+        machine-readable store data — not a measurement of any real AI
+        engine&apos;s rankings. The demo runs on a deterministic seeded store,
+        so every number is locked and rehearsable.
+      </p>
     </main>
   );
 }

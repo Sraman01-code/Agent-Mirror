@@ -35,7 +35,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-5 pb-24 pt-8 sm:px-6">
-      <header className="animate-rise flex flex-wrap items-center justify-between gap-4">
+      <header className="animate-rise flex flex-wrap items-center justify-between gap-4" role="banner">
         <div>
           <Link
             href="/"
@@ -83,20 +83,31 @@ export default async function DashboardPage() {
         ))}
       </nav>
 
-      <div className="mt-7 space-y-6">
+      <p
+        className="animate-rise mt-4 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-xs text-ink-muted"
+        style={{ animationDelay: "120ms" }}
+      >
+        <span className="rounded-full border border-line bg-surface px-3 py-1 font-mono text-[0.62rem] uppercase tracking-wide text-signal-good">
+          Locked &amp; rehearsable
+        </span>
+        Deterministic seeded demo — every number below is fixed; refresh or
+        skip any step and the figures stay identical.
+      </p>
+
+      <main id="content" className="mt-7 space-y-6">
         <ConnectBriefPanel data={demo} index={0} />
         <MirrorPanel data={demo} index={1} />
         <DiagnosePanel data={demo} index={2} />
         <PlanPanel data={demo} index={3} />
         <SimulatePanel data={demo} index={4} />
         <ReportPanel data={demo} index={5} />
-      </div>
+      </main>
 
-      <p className="mt-12 text-center font-mono text-[0.66rem] leading-relaxed tracking-wide text-ink-faint">
+      <footer className="mt-12 text-center text-xs leading-relaxed text-ink-muted">
         Likely representation based on machine-readable evidence and
-        shopping-agent evaluation rules — not a measurement of any real AI
-        engine. Deterministic seeded demo.
-      </p>
+        shopping-agent evaluation rules — <strong>not</strong> a measurement of
+        any real AI engine&apos;s behaviour or rankings.
+      </footer>
     </div>
   );
 }
