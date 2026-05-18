@@ -1,8 +1,22 @@
 import type { DemoResult } from "@/components/types";
 import { DeltaBar } from "@/components/primitives/DeltaBar";
 
-export function SimulatePanel({ data }: { data: DemoResult }) {
-  const { simulation } = data;
+// M6.1 wiring: the panel is unchanged for the static demo (it renders the
+// curated before/after, which the deterministic M6.1 engine reproduces
+// EXACTLY — base 58 → after 76, Δ+18, band At Risk, via the priority-ranked
+// curated subset clarify-return-policy + add-shipping-details +
+// add-product-specs). For interactive use, a parent inside a
+// <SimulationProvider> may pass `simulation` to drive the same view from a
+// live `POST /api/simulate` SimulationResult. When omitted, output is
+// byte-identical to M1.2 (no restyle, no number change, no other panel).
+export function SimulatePanel({
+  data,
+  simulation: override,
+}: {
+  data: DemoResult;
+  simulation?: DemoResult["simulation"];
+}) {
+  const simulation = override ?? data.simulation;
   const sample = simulation.sampleAnswers[0];
 
   return (

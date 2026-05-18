@@ -10,24 +10,27 @@ Status key: `[ ]` not done · `[x]` verified · `[~]` partial/blocked (add note)
 ---
 
 ## Global gates (re-run every milestone from M1.1)
-- [x] `npm run typecheck` passes  *(… · M4.2✓ · M5.1✓ · M5.2✓ clean)*
-- [x] `npm run lint` passes  *(… · M4.2✓ · M5.1✓ · M5.2✓ no warnings/errors;
+- [x] `npm run typecheck` passes  *(… · M5.1✓ · M5.2✓ · M6.1✓ clean)*
+- [x] `npm run lint` passes  *(… · M5.1✓ · M5.2✓ · M6.1✓ no warnings/errors;
   `next lint` deprecation notice is informational only, migrate before Next 16)*
-- [x] `npm run build` passes  *(… · M5.1✓ · M5.2✓ — 11 routes (+/api/recommend);
+- [x] `npm run build` passes  *(… · M5.2✓ · M6.1✓ — 12 routes (+/api/simulate);
   /dashboard still ○ static, 165 B / 106 kB byte-identical vs M1.2)*
 - [x] `npm test` passes (from M3.1 on)  *(M3.1✓ 6 audit · M4.1✓ +7 represent ·
-  M4.2✓ +8 factory · M5.1✓ +9 scoring · M5.2✓ +12 recommend = 42/42 green,
-  zero network)*
-- [x] No previously-checked item regressed  *(M5.2: recommend is additive &
-  pure (no LLM/represent/Date/random/fetch in hashable result — zero-network
-  test); audit/scoring/represent/store engines + their tests untouched so all
-  prior 30 tests stay green (42/42 total); seed/demoStore.ts +
-  seed/demoResult.json + scoring constants + 6 panels + dashboard untouched;
-  /dashboard still ○ static 165 B byte-identical; live /api/score still ARQ 58
-  at_risk, /api/represent/audit/store unbroken; locked demo numbers 58 / At
-  Risk / 76 / +18 / 92% unchanged; no scope creep (no simulator UI / dashboard
-  wiring / Shopify / DB / real-LLM ranking). No doc-contract changes needed
-  beyond the M5.2 checklist (M5.1's 60→58 band rationale stands as-is))*
+  M4.2✓ +8 factory · M5.1✓ +9 scoring · M5.2✓ +12 recommend · M6.1✓ +8
+  simulate = 50/50 green, zero network)*
+- [x] No previously-checked item regressed  *(M6.1: simulate is additive &
+  pure (numeric path = audit+score+M5.2 applier only; sample answers via
+  deterministic mockLlm — zero-network test asserts no fetch); reuses the M5.2
+  FixPatch applier (no duplicated patch logic); audit/scoring/recommend/
+  represent/store engines + their tests untouched so all prior 42 tests stay
+  green (50/50 total); seed/demoStore.ts + seed/demoResult.json + scoring
+  constants + recommendation templates + M5.1 band decision UNCHANGED;
+  /dashboard still ○ static 165 B / 106 kB byte-identical (SimulatePanel gained
+  an optional override prop that defaults to the static data → DOM unchanged;
+  no restyle, no other panel touched); live /api/simulate→58→76/Δ+18,
+  /api/recommend|score|represent|audit|store all unbroken; locked demo numbers
+  58 / At Risk / 76 / +18 / 92% unchanged; no scope creep (no Shopify / DB /
+  real-LLM / M7.1))*
 - [x] Relevant `docs/*.md` updated in the same commit (docs-are-contracts)
 
 ---
@@ -161,9 +164,29 @@ Status key: `[ ]` not done · `[x]` verified · `[~]` partial/blocked (add note)
 
 ## Phase 6 — Simulator
 ### M6.1 Simulation
-- [ ] Source store never mutated
-- [ ] before == base score; applying all recs raises ARQ deterministically
-- [ ] Toggling reversible/idempotent
+- [x] Source store never mutated  *(engine reads store/findings only; the
+  reused M5.2 `applyFixPatch` deep-clones (structuredClone) per call; test
+  asserts `JSON.stringify(demoStore)` + source `findings` byte-identical
+  before/after running curated AND all-recs simulations; no-mutation also
+  verified for findings array)*
+- [x] before == base score; applying all recs raises ARQ deterministically
+  *(before === score(store,brief,findings): ARQ 58, band at_risk — equals
+  M5.1 base; applying ALL 11 recs strictly increases ARQ (58→100, test
+  asserts after>before); numeric path is audit+score+patch only, zero
+  network/LLM (mockLlm advisory only for sample-answer narrative))*
+- [x] Toggling reversible/idempotent  *(same selection ⇒ byte-identical
+  SimulationResult excl. informational `computedAt`; empty selection ⇒
+  after==before, Δ0; select-then-deselect returns byte-identical to the
+  pre-selection result; verified unit + two live POST /api/simulate calls)*
+- [x] Curated subset reproduces locked 58→76 / Δ+18 / At Risk  *(brute-forced
+  all 2^11 subsets: the priority-ranked **top-3** recommendations
+  `clarify-return-policy + add-shipping-details + add-product-specs`
+  (= demoResult.json plan r1/r2/r3) deterministically give after ARQ **76**,
+  delta **+18**, band **at_risk**, 19 findings resolved / 0 introduced;
+  natural priority-ranked subset DID reproduce 76 — no scoring/seed/template/
+  locked-number change needed; verified unit + live POST /api/simulate;
+  BAD_INPUT on malformed body; SimulatePanel renders this unchanged for the
+  static demo)*
 
 ## Phase 7 — Report
 ### M7.1 Report + export
