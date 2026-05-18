@@ -17,11 +17,12 @@ Status key: `[ ]` not done · `[x]` verified · `[~]` partial/blocked (add note)
 - [x] `npm run build` passes  *(M1.1✓ · M1.2✓ · M2.1✓ · M2.2✓ — 7 routes
   (+/api/store); /dashboard still ○ static, 165 B / 106 kB byte-identical
   vs M1.2)*
-- [ ] `npm test` passes (from M3.1 on)
-- [x] No previously-checked item regressed  *(M2.2: seed/demoResult.json + all
-  6 panels untouched; /dashboard reads typed Store via StoreSource but renders
-  the same name "Trailhead Supply Co." → identical static bundle; locked demo
-  numbers 58 / At Risk / 76 / +18 / 92% unchanged)*
+- [x] `npm test` passes (from M3.1 on)  *(M3.1✓ — Vitest 2.1.9 added;
+  `npm test` = `vitest run`; 6/6 audit tests green)*
+- [x] No previously-checked item regressed  *(M3.1: detectors/audit/api/tests
+  are additive; seed/demoResult.json + all 6 panels + dashboard untouched;
+  /dashboard still ○ static 165 B byte-identical; locked demo numbers 58 /
+  At Risk / 76 / +18 / 92% unchanged; M2.1/M2.2 store+model APIs unaffected)*
 - [x] Relevant `docs/*.md` updated in the same commit (docs-are-contracts)
 
 ---
@@ -74,9 +75,20 @@ Status key: `[ ]` not done · `[x]` verified · `[~]` partial/blocked (add note)
 
 ## Phase 3 — Audit Engine
 ### M3.1 Detectors
-- [ ] Every planted defect produces a `Finding`
-- [ ] `audit(seed)` byte-identical across runs
-- [ ] Detector unit tests green
+- [x] Every planted defect produces a `Finding`  *(8 detectors; `audit(demoStore,
+  demoBrief)` → 45 findings covering all 8 kinds: missing_field, thin_content,
+  ambiguous_value, contradiction, missing_attribute, unanswered_question,
+  weak_differentiation, trust_gap; verified via test + POST /api/audit)*
+- [x] `audit(seed)` byte-identical across runs  *(determinism unit test + two
+  live POST /api/audit calls JSON-identical; ids deterministic from
+  kind+entityId+fieldPath+reasonCode, all unique; no Date/random)*
+- [x] Detector unit tests green  *(src/domain/audit/audit.test.ts: 6/6 pass —
+  kind coverage, determinism, stable order, required-fields, id stability,
+  no-scoring guard)*
+- [~] Dashboard rendering of real `Finding[]`: deliberately deferred by
+  operator instruction (M3.1 task scoped to engine+API+tests; "do not change
+  panel content/visuals"). Engine + `POST /api/audit` are ready for a later
+  wiring milestone; no checklist item depends on it and nothing regressed.
 
 ## Phase 4 — Representation Evaluator
 ### M4.1 Port + mock
