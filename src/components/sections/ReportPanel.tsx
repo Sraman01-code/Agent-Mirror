@@ -7,8 +7,26 @@ const COVERAGE_STYLE: Record<QuestionCoverageItem["status"], string> = {
   unanswered: "bg-red-500/15 text-red-400",
 };
 
-export function ReportPanel({ data }: { data: DemoResult }) {
-  const { acpPreview, questionCoverage, honestyNote } = data;
+// M7.1 wiring: the panel is unchanged for the static demo (it renders the
+// seed ACP 92% / question coverage / honesty note, which the deterministic
+// M7.1 report assembler reproduces — ACP coverage = 92, ARQ 58 → 76 Δ+18,
+// canonical 8-question coverage). For interactive/export use, a parent may
+// pass live overrides driven by GET /api/report; when omitted, output is
+// byte-identical to M1.2 (no restyle, no number change, no other panel).
+export function ReportPanel({
+  data,
+  acpPreview: acpOverride,
+  questionCoverage: qcOverride,
+  honestyNote: noteOverride,
+}: {
+  data: DemoResult;
+  acpPreview?: DemoResult["acpPreview"];
+  questionCoverage?: DemoResult["questionCoverage"];
+  honestyNote?: string;
+}) {
+  const acpPreview = acpOverride ?? data.acpPreview;
+  const questionCoverage = qcOverride ?? data.questionCoverage;
+  const honestyNote = noteOverride ?? data.honestyNote;
   const counts = questionCoverage.reduce<Record<string, number>>((acc, q) => {
     acc[q.status] = (acc[q.status] ?? 0) + 1;
     return acc;

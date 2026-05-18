@@ -11,3 +11,27 @@ body {
   padding: 0;
   margin: 0;
 }
+
+/* M7.1: print-only polish so the on-screen report is legible when printed
+   (PROJECT_MEMORY §5 report/export preview). Screen rendering is untouched —
+   these rules apply only in print, so the static dashboard DOM/visuals stay
+   byte-identical. No app redesign. */
+@media print {
+  :root {
+    color-scheme: light;
+  }
+  html,
+  body {
+    background: #ffffff !important;
+    color: #111111 !important;
+  }
+  a {
+    color: #111111 !important;
+    text-decoration: underline;
+  }
+  section {
+    break-inside: avoid;
+    border-color: #cccccc !important;
+    background: #ffffff !important;
+  }
+}

@@ -10,27 +10,28 @@ Status key: `[ ]` not done · `[x]` verified · `[~]` partial/blocked (add note)
 ---
 
 ## Global gates (re-run every milestone from M1.1)
-- [x] `npm run typecheck` passes  *(… · M5.1✓ · M5.2✓ · M6.1✓ clean)*
-- [x] `npm run lint` passes  *(… · M5.1✓ · M5.2✓ · M6.1✓ no warnings/errors;
+- [x] `npm run typecheck` passes  *(… · M5.2✓ · M6.1✓ · M7.1✓ clean)*
+- [x] `npm run lint` passes  *(… · M5.2✓ · M6.1✓ · M7.1✓ no warnings/errors;
   `next lint` deprecation notice is informational only, migrate before Next 16)*
-- [x] `npm run build` passes  *(… · M5.2✓ · M6.1✓ — 12 routes (+/api/simulate);
+- [x] `npm run build` passes  *(… · M6.1✓ · M7.1✓ — 13 routes (+/api/report);
   /dashboard still ○ static, 165 B / 106 kB byte-identical vs M1.2)*
 - [x] `npm test` passes (from M3.1 on)  *(M3.1✓ 6 audit · M4.1✓ +7 represent ·
   M4.2✓ +8 factory · M5.1✓ +9 scoring · M5.2✓ +12 recommend · M6.1✓ +8
-  simulate = 50/50 green, zero network)*
-- [x] No previously-checked item regressed  *(M6.1: simulate is additive &
-  pure (numeric path = audit+score+M5.2 applier only; sample answers via
-  deterministic mockLlm — zero-network test asserts no fetch); reuses the M5.2
-  FixPatch applier (no duplicated patch logic); audit/scoring/recommend/
-  represent/store engines + their tests untouched so all prior 42 tests stay
-  green (50/50 total); seed/demoStore.ts + seed/demoResult.json + scoring
-  constants + recommendation templates + M5.1 band decision UNCHANGED;
-  /dashboard still ○ static 165 B / 106 kB byte-identical (SimulatePanel gained
-  an optional override prop that defaults to the static data → DOM unchanged;
-  no restyle, no other panel touched); live /api/simulate→58→76/Δ+18,
-  /api/recommend|score|represent|audit|store all unbroken; locked demo numbers
-  58 / At Risk / 76 / +18 / 92% unchanged; no scope creep (no Shopify / DB /
-  real-LLM / M7.1))*
+  simulate · M7.1✓ +7 report = 57/57 green, zero network)*
+- [x] No previously-checked item regressed  *(M7.1: report is additive &
+  pure — `buildReport` composes the EXISTING audit/score/represent/recommend/
+  simulate engines + the new deterministic `computeAcpPreview` (no duplicated
+  logic; numeric path zero-network — fetch-stub test asserts no call;
+  representation narrative via deterministic mockLlm only); all prior 50 tests
+  untouched & green (57/57 total); seed/demoStore.ts + seed/demoResult.json +
+  scoring constants + recommendation templates + M5.1 band + M6.1 curated
+  subset UNCHANGED; /dashboard still ○ static 165 B / 106 kB byte-identical
+  (ReportPanel gained optional override props defaulting to static data → DOM
+  unchanged; print CSS is `@media print` only → screen DOM/visuals identical;
+  no restyle, no other panel); live /api/report json+md deterministic &
+  matching, /api/simulate|recommend|score|represent|audit|store all unbroken;
+  locked demo numbers 58 / At Risk / 76 / +18 / 92% unchanged; no scope creep
+  (no Shopify / DB / PDF/email/storage / live ACP submit / M8.1))*
 - [x] Relevant `docs/*.md` updated in the same commit (docs-are-contracts)
 
 ---
@@ -190,8 +191,27 @@ Status key: `[ ]` not done · `[x]` verified · `[~]` partial/blocked (add note)
 
 ## Phase 7 — Report
 ### M7.1 Report + export
-- [ ] `/api/report?format=md|json` matches on-screen data
-- [ ] Print view legible
+- [x] `/api/report?format=md|json` matches on-screen data  *(GET
+  /api/report?format=json → `{ok:true,data:{report:ReportPayload}}`
+  deterministic across two live calls (generatedAt/computedAt excluded);
+  ?format=md → `{ok:true,data:{markdown}}` whose tokens match the same
+  report — verified live: arq 58, after 76, Δ+18, ACP 92%, 8-question
+  coverage; markdown contains "Trailhead Supply Co.", "AquaTrail Pro",
+  "ARQ 58", "After 76", "Delta +18", "ACP 92%", honesty note; on-screen
+  ReportPanel already shows ACP 92% / coverage / honesty note from the seed
+  fixture which the assembler reproduces; ?format=pdf → 400 BAD_INPUT;
+  buildReport composes existing engines, no duplicated logic, numeric path
+  zero-network)*
+- [x] Print view legible  *(globals.css `@media print` block: light color
+  scheme, white bg / dark text, underlined links, `break-inside:avoid` on
+  sections — print-only so screen DOM/visuals are byte-identical; /dashboard
+  still ○ static 165 B / 106 kB; no app redesign)*
+- [x] ACP coverage deterministically 92% for the seed  *(src/domain/report/
+  acpSchema.ts: 11 conventional feed fields × 10 seed products = 110 cells,
+  101 populated → Math.round(91.818)=**92**; pure (identical store ⇒ identical
+  preview); reached WITHOUT touching any locked artifact — only the new
+  acpSchema is the tunable surface; 7/7 report tests green incl. determinism,
+  JSON round-trip, markdown facts, canonical 8-question coverage, no-network)*
 
 ## Phase 8 — Shopify Ingestion
 ### M8.1 shopifyStore
